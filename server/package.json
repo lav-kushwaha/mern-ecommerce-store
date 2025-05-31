@@ -1,0 +1,11 @@
+{
+  "name": "lavproject",
+  "version": "1.0.0",
+  "description": "Ecommerce Shopping Website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lav Kushwaha",
+  "license": "ISC"
+}
