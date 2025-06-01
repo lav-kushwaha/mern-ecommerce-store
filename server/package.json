@@ -4,8 +4,17 @@
   "description": "Ecommerce Shopping Website",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Lav Kushwaha",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cookies": "^0.9.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.1",
+    "nodemon": "^3.1.10"
+  }
 }
