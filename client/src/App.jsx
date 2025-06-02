@@ -13,28 +13,47 @@ import ShoppingHome from "./components/shopping-view/home"
 import ShoppingListing from "./components/shopping-view/listing"
 import ShoppingCheckout from "./components/shopping-view/checkout"
 import ShoppingAccount from "./components/shopping-view/account"
+import CheckAuth from "./components/common/check-auth"
 
 function App() {
+
+   const isAuthenticated = false;
+   const user = null;
+
   return (
     <div className="flex flex-col overflow-hidden bg-white">
         <Routes>
 
             {/* auth components */}
-           <Route path="/auth" element={<AuthLayout/>}>
+           <Route path="/auth" element={
+              <CheckAuth isAuthenticated={isAuthenticated}>
+                 <AuthLayout/>
+              </CheckAuth>
+           }>
               <Route path="login" element={<AuthLogin/>}/>
               <Route path="register" element={<Authregister/>}/>
            </Route>
 
+
            {/* Admin components */}
-           <Route path="/admin" element={<AdminLayout/>}>
+           <Route path="/admin" element={
+               <CheckAuth isAuthenticated={isAuthenticated}>
+                  <AdminLayout/>
+               </CheckAuth>
+           }>
               <Route path="dashboard" element={<AdminDashboard/>}/>
               <Route path="products" element={<AdminProducts/>}/>
               <Route path="orders" element={<AdminOrders/>}/>
               <Route path="features" element={<AdminFeatures/>}/>
            </Route>
 
+
             {/* Shopping components */}
-           <Route path="/shop" element={<ShoppingLayout/>}>
+           <Route path="/shop" element={
+             <CheckAuth isAuthenticated={isAuthenticated}>
+               <ShoppingLayout/>
+             </CheckAuth>
+           }>
               <Route path="home" element={<ShoppingHome/>}/>
               <Route path="listing" element={<ShoppingListing/>}/>
               <Route path="checkout" element={<ShoppingCheckout/>}/>
