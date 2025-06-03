@@ -1,10 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/database");
-const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const { authRouter } = require("./router/authRouter");
+const authRouter = require('./routes/auth/auth-routes.js');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,8 +27,8 @@ app.use(
   })
 );
 
+app.use("/api/auth",authRouter);
 
-app.use("/", authRouter);
 
 //connecting DB
 connectDB()
