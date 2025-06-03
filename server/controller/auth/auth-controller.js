@@ -58,27 +58,83 @@ const registerUser = async (req, res) => {
 
 
 //Login
-const login = async(req,res)=>{
-    const{email,password} = req.body;
-    try{
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
-    }catch(e){
-        console.log(e);
-        res.status(500).json({
-            success:false,
-            message:"Some error occured!"
-        })
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials."
+      });
     }
-}
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials."
+      });
+    }
+
+    const token = jwt.sign(
+      { _id: user._id },
+      process.env.JWTSECRET,
+      { expiresIn: '2d' }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+      secure:false
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful.",
+      user: {
+        _id: user._id,
+        email: user.email,
+        userName: user.userName
+      }
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error."
+    });
+  }
+};
 
 
 
 //logout
+const logoutUser = (req, res) => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: false
+    });
 
-
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully."
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: "Logout failed."
+    });
+  }
+};
 
 //auth middleware
 
 
 
-module.exports = {registerUser}
+module.exports = {registerUser,loginUser}
