@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import CommonForm from '../../components/common/form';
 import { loginFormControls } from '../../config';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../store/auth-slice';
+import { toast } from "sonner"
+
 
 const initialState = {
   email: '',
@@ -10,9 +14,20 @@ const initialState = {
 
 const AuthLogin = () => {
   const [formData, setFormData] = useState(initialState);
+  const dispatch = useDispatch();
 
-  function onSubmit(e) {
-    
+  function onSubmit(event) {
+     event.preventDefault();
+
+   dispatch(loginUser(formData)).then((data) => {
+     console.log(data);
+     if (data?.payload?.success) {
+       toast.success(data.payload.message); 
+     } else {
+       toast.error(data.payload?.message || "Something went wrong");
+     }
+   });
+
   }
 
   return (
