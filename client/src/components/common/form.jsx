@@ -101,7 +101,7 @@ const CommonForm = ({formControls, formData, setFormData, onSubmit, buttonText})
                 </div>)
             }
         </div>
-        <Button type='submit' className='mt-2 w-full'>{buttonText || 'Submit'}</Button>
+        <Button type='submit' className='mt-2 w-full cursor-pointer'>{buttonText || 'Submit'}</Button>
    </form>
   )
 }

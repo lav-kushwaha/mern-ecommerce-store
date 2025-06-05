@@ -56,7 +56,6 @@ const registerUser = async (req, res) => {
     }
 };
 
-
 //Login
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -110,8 +109,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-
-
 //logout
 const logoutUser = (req, res) => {
   try {
@@ -124,6 +121,7 @@ const logoutUser = (req, res) => {
       success: true,
       message: "Logged out successfully."
     });
+
   } catch (e) {
     console.error(e);
     res.status(500).json({
@@ -134,7 +132,37 @@ const logoutUser = (req, res) => {
 };
 
 //auth middleware
+const authMiddleware = async (req, res, next) => {
+  const { token } = req.cookies;
 
+  try {
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized User!",
+      });
+    }
 
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    const { _id } = decoded;
 
-module.exports = {registerUser,loginUser}
+    const user = await User.findById(_id).select("-password"); //  don't fetch password
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized User!",
+    });
+  }
+};
+
+module.exports = {registerUser,loginUser,logoutUser,authMiddleware}
