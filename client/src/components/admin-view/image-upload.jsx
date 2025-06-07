@@ -13,16 +13,19 @@ function handleImageFileChange(event){
     if(selectedFile) setImageFile(selectedFile);
 }
 
+//handle drag drop
 function handleDragOver(event){
     event.preventDefault();
 }
 
+//handle drop
 function handleDrop(event){
    event.preventDefault();
    const droppedFile = event.dataTransfer.files?.[0];
    if(droppedFile) setImageFile(droppedFile);
 }
 
+  //handleremove image
 function handleRemoveImage(event){
   setImageFile(null)
 }
