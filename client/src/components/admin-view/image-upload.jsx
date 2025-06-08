@@ -1,16 +1,26 @@
 import React, { useRef } from 'react'
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { UploadCloudIcon, XIcon } from 'lucide-react';
+import { FileIcon, UploadCloudIcon, XIcon } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const ProductImageUpload = ({imageFile,setImageFile, uploadedImageUrl, setUploadedImageUrl}) => {
 
 const inputRef = useRef(null);
 
+//select file
 function handleImageFileChange(event){
     console.log(event.target.files);
-    const selectedFile = event.target.files?.[0]
+    const selectedFile = event.target.files?.[0]    
     if(selectedFile) setImageFile(selectedFile);
+}
+
+//drop file
+function handleDrop(event){
+   event.preventDefault();
+   const droppedFile = event.dataTransfer.files?.[0];
+  console.log(droppedFile)
+   if(droppedFile) setImageFile(droppedFile);
 }
 
 //handle drag drop
@@ -18,17 +28,17 @@ function handleDragOver(event){
     event.preventDefault();
 }
 
-//handle drop
-function handleDrop(event){
-   event.preventDefault();
-   const droppedFile = event.dataTransfer.files?.[0];
-   if(droppedFile) setImageFile(droppedFile);
-}
-
   //handleremove image
 function handleRemoveImage(event){
-  setImageFile(null)
+  setImageFile(null);
+  if(inputRef.current){
+    //we are clearing input current value so that if user try to upload same file, 
+    //onChange will be trigger otherwise it wont trigger.
+      inputRef.current.value = "";
+  }
 }
+
+
 
   return (
     <div className='w-full max-w-md mx-auto mt-4'>
@@ -42,15 +52,18 @@ function handleRemoveImage(event){
             onChange={handleImageFileChange}/>
             {
               !imageFile ? 
+              
               <Label htmlFor="image-upload" className="flex flex-col items-center justify-center h-32 cursor-pointer">
                   <UploadCloudIcon className='w-10 h-10 text-muted-foreground mb-2'/>
                   <span>Drag & Drop or Click To Upload Image </span>
-              </Label> : <div className='flex items-center justify-between'>
+              </Label>
+              
+              : <div className='flex items-center justify-between'>
                 <div className='flex items-center'>
                   <FileIcon className="w-8 text-primary mr-2 h-8 "/>
                 </div>
                 <p className='text-sm font-medium'>{imageFile.name}</p>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={handleRemoveImage}>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground cursor-pointer" onClick={handleRemoveImage}>
                   <XIcon className='w-4 h-4 '/>
                   <span className='sr-only'>Remove File</span>
                 </Button>
