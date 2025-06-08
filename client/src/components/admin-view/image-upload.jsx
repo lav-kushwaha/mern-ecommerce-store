@@ -1,16 +1,18 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { FileIcon, UploadCloudIcon, XIcon } from 'lucide-react';
 import { Button } from '../ui/button';
+import axios from 'axios';
 
-const ProductImageUpload = ({imageFile,setImageFile, uploadedImageUrl, setUploadedImageUrl}) => {
+
+const ProductImageUpload = ({imageFile,setImageFile, uploadedImageUrl, setUploadedImageUrl,setImageLoadingState}) => {
 
 const inputRef = useRef(null);
 
 //select file
 function handleImageFileChange(event){
-    console.log(event.target.files);
+    // console.log(event.target.files);
     const selectedFile = event.target.files?.[0]    
     if(selectedFile) setImageFile(selectedFile);
 }
@@ -19,7 +21,7 @@ function handleImageFileChange(event){
 function handleDrop(event){
    event.preventDefault();
    const droppedFile = event.dataTransfer.files?.[0];
-  console.log(droppedFile)
+  // console.log(droppedFile)
    if(droppedFile) setImageFile(droppedFile);
 }
 
@@ -33,11 +35,27 @@ function handleRemoveImage(event){
   setImageFile(null);
   if(inputRef.current){
     //we are clearing input current value so that if user try to upload same file, 
-    //onChange will be trigger otherwise it wont trigger.
-      inputRef.current.value = "";
+    //onChange will be trigger otherwise it wont trigger and if it wont trigger file will not be upload.
+    inputRef.current.value = "";
   }
 }
 
+async function uploadImageToCloudinary() {
+   setImageLoadingState(true);
+   const data = new FormData();
+   data.append('my_file',imageFile);
+   const response = await axios.post("http://localhost:5000/api/admin/products/upload-image", data);
+   console.log(response.data);
+   if(response?.data?.success){
+    setUploadedImageUrl(response?.data?.url);
+    setImageLoadingState(false);
+   } 
+
+}
+
+useEffect(()=>{
+  if(imageFile!==null) uploadImageToCloudinary();
+},[imageFile])
 
 
   return (
