@@ -14,7 +14,10 @@ async function uploadImageToCloudinary(file) {
     return result;
 }
 
-const storage = new multer.memoryStorage();
-const upload = multer({storage});
+//multer to get file from req or from client side.
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
 
 module.exports = {upload,uploadImageToCloudinary}
