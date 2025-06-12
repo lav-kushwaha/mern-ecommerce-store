@@ -6,6 +6,7 @@ const initialState = {
   productList: [],
 };
 
+//Add New Product APIs
 export const addNewProduct = createAsyncThunk(
   "/products/addnewproduct",
   async (formData) => {
@@ -23,6 +24,7 @@ export const addNewProduct = createAsyncThunk(
   }
 );
 
+//fetchAll Products APIs
 export const fetchAllProducts = createAsyncThunk(
   "/products/fetchAllProducts",
   async () => {
@@ -34,6 +36,7 @@ export const fetchAllProducts = createAsyncThunk(
   }
 );
 
+//edit product APIs
 export const editProduct = createAsyncThunk(
   "/products/editProduct",
   async ({ id, formData }) => {
@@ -51,6 +54,7 @@ export const editProduct = createAsyncThunk(
   }
 );
 
+//delete product APIs
 export const deleteProduct = createAsyncThunk(
   "/products/deleteProduct",
   async (id) => {
@@ -62,6 +66,7 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
+//admin product slice
 const AdminProductsSlice = createSlice({
   name: "adminProducts",
   initialState,
