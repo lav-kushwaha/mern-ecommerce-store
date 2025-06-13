@@ -15,7 +15,7 @@ function AdminProductTile({
         <img
           src={product?.image}
           alt={product?.title}
-          className="w-full h-full object-fit"
+          className="w-full h-full object-contain"
         />
       </div>
 
@@ -47,15 +47,17 @@ function AdminProductTile({
       <CardFooter className="flex justify-between px-3 pb-3">
         <Button
           size="sm"
+          className="cursor-pointer"
           onClick={() => {
             setOpenCreateProductsDialog(true);
             setCurrentEditedId(product?._id);
-            setFormData(product);
+            setFormData(product); 
           }}
         >
           Edit
         </Button>
         <Button
+        className="cursor-pointer"
           size="sm"
           variant="destructive"
           onClick={() => handleDelete(product?._id)}

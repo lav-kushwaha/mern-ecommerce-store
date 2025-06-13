@@ -6,7 +6,15 @@ import { Button } from '../ui/button';
 import axios from 'axios';
 
 
-const ProductImageUpload = ({imageFile,setImageFile,imageLoadingState, uploadedImageUrl, setUploadedImageUrl,setImageLoadingState}) => {
+const ProductImageUpload = ({
+  imageFile,
+  setImageFile,
+  imageLoadingState, 
+  uploadedImageUrl, 
+  setUploadedImageUrl,
+  setImageLoadingState,
+  isEditMode
+}) => {
 
 const inputRef = useRef(null);
 
@@ -61,17 +69,19 @@ useEffect(()=>{
   return (
     <div className='w-full max-w-md mx-auto mt-4'>
         <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
-        <div onDragOver={handleDragOver} onDrop={handleDrop} className='border-2 border-dashed rounded-lg p-4'>
+        <div onDragOver={handleDragOver} onDrop={handleDrop} className={`${isEditMode?'opacity-60':""}border-2 border-dashed rounded-lg p-4`}>
             <Input 
             id="image-upload" 
             type="file" 
             className="hidden" 
             ref={inputRef} 
-            onChange={handleImageFileChange}/>
+            onChange={handleImageFileChange}
+            disabled={isEditMode}
+            />
             {
               !imageFile ? 
               
-             ( <Label htmlFor="image-upload" className="flex flex-col items-center justify-center h-32 cursor-pointer">
+             ( <Label htmlFor="image-upload" className={`${isEditMode?"cursor-not-allowed":" "}flex flex-col items-center justify-center h-32 cursor-pointer`}>
                   <UploadCloudIcon className='w-10 h-10 text-muted-foreground mb-2'/>
                   <span>Drag & Drop or Click To Upload Image </span>
               </Label>)
