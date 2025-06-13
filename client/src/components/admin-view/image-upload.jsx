@@ -43,15 +43,14 @@ function handleRemoveImage(event){
 //upload image on cloudinary API
 async function uploadImageToCloudinary() {
    setImageLoadingState(true);
-   const data = new FormData();
+   const data = new FormData();  //webAPI
    data.append('my_file',imageFile);
    const response = await axios.post("http://localhost:5000/api/admin/products/upload-image", data);
-   console.log(response.data);
-   if(response?.data?.success){
-    setUploadedImageUrl(response?.data?.url);
+   console.log(response?.data);
+   if(response?.data?.success){    
+    setUploadedImageUrl(response?.data?.data?.url);
     setImageLoadingState(false);
    } 
-
 }
 
 useEffect(()=>{
