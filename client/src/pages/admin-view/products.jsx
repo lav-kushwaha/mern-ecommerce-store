@@ -7,6 +7,7 @@ import ProductImageUpload from '../../components/admin-view/image-upload';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewProduct, fetchAllProducts } from '../../store/admin/products-slice';
 import { toast } from "sonner"
+import AdminProductTile from '../../components/admin-view/product-tile';
 
 
 const initialFormData = {
@@ -27,6 +28,8 @@ const AdminProducts = () => {
   const [imageFile,setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
+
 
   const {productList} = useSelector((state)=>state.adminProduct);  
 
@@ -35,6 +38,7 @@ const AdminProducts = () => {
   //add products
   function onSubmit(event){
     event.preventDefault();
+    
     dispatch(addNewProduct({
       ...formData,
       image:uploadedImageUrl
@@ -46,11 +50,11 @@ const AdminProducts = () => {
           setOpenCreateProductsDialog(false);
           setImageFile(null);
           setFormData(initialFormData);
-          toast.success(data.payload.message); 
+          toast.success(data?.payload?.message); 
         }
      })
     .catch((err)=>{ 
-        console.log(err.msg);
+        console.log(err.message);
     })
   }
 
@@ -64,7 +68,13 @@ const AdminProducts = () => {
         <Button  className='cursor-pointer' onClick={()=>setOpenCreateProductsDialog(true)}>Add New Products</Button>
       </div>
 
-      <div className='grid gap-4 md:grid-cols-3 lg:grid-cols-4'></div>
+      <div className='grid gap-4 md:grid-cols-3 lg:grid-cols-4'>
+          {
+            productList && productList.length > 0 ?
+            productList.map(productItem=><AdminProductTile setFormData={setFormData} setOpenCreateProductsDialog={setOpenCreateProductsDialog} setCurrentEditedId={setCurrentEditedId} product={productItem}/>) : null
+          }
+      </div>
+
       <Sheet open={openCreateProductsDialog} onOpenChange={()=>{setOpenCreateProductsDialog(false)}}>
        <SheetContent side="right" className="overflow-y-auto max-h-screen max-w-xl w-full p-6">
         <SheetHeader>
