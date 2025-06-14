@@ -18,13 +18,12 @@ const AuthLogin = () => {
 
   function onSubmit(event) {
      event.preventDefault();
-
-   dispatch(loginUser(formData)).then((data) => {
+     dispatch(loginUser(formData)).then((data) => {
      console.log(data);
      if (data?.payload?.success) {
-       toast.success(data.payload.message); 
+       toast.success(data?.payload?.message); 
      } else {
-       toast.error(data.payload?.message || "Something went wrong");
+       toast.error(data?.payload?.message || "Something went wrong");
      }
    });
 
