@@ -40,6 +40,21 @@ export const loginUser = createAsyncThunk('/auth/login',
   }
 );
 
+//logout
+export const logoutUser = createAsyncThunk('/auth/logout',
+  async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/logout',{},
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+);
+
 // Check Auth Thunk
 export const checkAuth = createAsyncThunk('/auth/checkauth',
   async (_, { rejectWithValue }) => {
@@ -50,7 +65,7 @@ export const checkAuth = createAsyncThunk('/auth/checkauth',
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           Expires: '0'
         }
-      });
+      });      
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: "Something went wrong in auth" });
@@ -108,6 +123,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
+        console.log(action,+"action")
         state.isLoading = false;
         state.user = action.payload?.success ? action.payload.user : null;
         state.isAuthenticated = action.payload?.success;
@@ -117,6 +133,14 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.error = action.payload?.message || "Auth check failed";
+      })
+
+      //logout user
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = action.payload?.message || "Logout failed";
       });
   }
 });
