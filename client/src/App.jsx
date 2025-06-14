@@ -25,7 +25,7 @@ function App() {
    const dispatch = useDispatch();
 
    useEffect(()=>{
-      dispatch(checkAuth())
+      dispatch(checkAuth());
    },[dispatch]);
 
    if(isLoading) return <div>Loading..</div>

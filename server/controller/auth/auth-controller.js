@@ -96,7 +96,8 @@ const loginUser = async (req, res) => {
       user: {
         _id: user._id,
         email: user.email,
-        userName: user.userName
+        userName: user.userName,
+        role: user.role
       }
     });
 
@@ -134,7 +135,7 @@ const logoutUser = (req, res) => {
 //auth middleware
 const authMiddleware = async (req, res, next) => {
   const { token } = req.cookies;
-
+  
   try {
     if (!token) {
       return res.status(401).json({
