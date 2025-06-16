@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRouter = require('./routes/auth/auth-routes.js');
 const adminProductsRouter = require('../server/routes/admin/products-routes.js')
+const shopProductsRouter = require("../server/routes/shop/products-routes.js")
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(
 
 app.use("/api/auth",authRouter);
 app.use("/api/admin/products",adminProductsRouter);
+app.use("/api/shop/products",shopProductsRouter);  
 
 
 //connecting DB
