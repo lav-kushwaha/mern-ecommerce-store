@@ -3,7 +3,7 @@ import { filterOptions } from '../../config';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 
-const ProductFilter = () => (
+const ProductFilter = ({filters, handleFilter}) => (
   <aside className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 w-full max-w-xs">
     {/* Title */}
     <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Filters</h2>
@@ -20,7 +20,7 @@ const ProductFilter = () => (
                 htmlFor={`filter-${group}-${opt.id}`}
                 className="inline-flex items-center gap-3 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
               >
-                <Checkbox id={`filter-${group}-${opt.id}`} className="h-4 w-4" />
+                <Checkbox id={`filter-${group}-${opt.id}`} onCheckedChange={()=>handleFilter(group,opt.id)} className="h-4 w-4" />
                 <span className="text-sm">{opt.label}</span>
               </Label>
             ))}
