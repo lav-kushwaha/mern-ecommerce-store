@@ -17,16 +17,28 @@ import ShoppingProductTile from '../../components/shopping-view/product-tile';
 
 const ShoppingListing = () => {
 
+  const {productList} = useSelector((state)=>state.shopProducts);
+ const dispatch = useDispatch();
+
+  const {filters,setFilters} = useState(null);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].id);
 
-  const {productList} = useSelector((state)=>state.shopProducts);
-  const dispatch = useDispatch();
+
+ function handleFilter(getSectionId, getCurrentOption) {
+  console.log(getSectionId, getCurrentOption);
+  const filteredProducts = productList.filter(
+    (product) => product[getSectionId] === getCurrentOption
+  );
+  return filteredProducts;
+}
+
+
 
   useEffect(()=>{
     dispatch(fetchAllFilteredProducts()).then((data)=>{
         if(data?.payload?.success){
             // console.log(data);
-            
+
         }
     })
   },[dispatch])
@@ -37,7 +49,7 @@ const ShoppingListing = () => {
     <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 p-4 md:p-6">
       
       {/* Left Sidebar */}
-      <ProductFilter />
+      <ProductFilter filters={filters} handleFilter={handleFilter}/>
 
       {/* Product Listing Area */}
       <div className="bg-white dark:bg-background w-full rounded-xl shadow-md">
@@ -49,7 +61,7 @@ const ShoppingListing = () => {
           </h2>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">10 Products</span>
+            <span className="text-sm text-muted-foreground">{productList?.length} Products</span>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -64,13 +76,13 @@ const ShoppingListing = () => {
                   value={selectedSort}
                   onValueChange={(value) => setSelectedSort(value)}
                 >
-                  {sortOptions.map((item) => (
+                  {sortOptions.map((Sortitem) => (
                     <DropdownMenuRadioItem
-                      key={item.id}
-                      value={item.id}
+                      key={Sortitem.id}
+                      value={Sortitem.id}
                       className="cursor-pointer text-sm hover:bg-accent hover:text-accent-foreground"
                     >
-                      {item.label}
+                      {Sortitem.label}
                     </DropdownMenuRadioItem>
                   ))}
                 </DropdownMenuRadioGroup>
