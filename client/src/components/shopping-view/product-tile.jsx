@@ -2,6 +2,8 @@ import React from 'react'
 import { Card, CardContent, CardFooter } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
+import { brandOptionsMap,categoryOptionsMap } from '../../config'
+
 
 const ShoppingProductTile = ({ product }) => {
   const isOnSale = product?.salePrice > 0 && product?.salePrice < product?.price;
@@ -25,8 +27,8 @@ const ShoppingProductTile = ({ product }) => {
         <CardContent className="p-4 space-y-2">
           <h2 className="text-lg font-semibold truncate">{product?.title}</h2>
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{product?.category}</span>
-            <span>{product?.brand}</span>
+            <span>{categoryOptionsMap[product?.category]}</span>
+            <span>{brandOptionsMap[product?.brand]}</span>
           </div>
 
           <div className="flex justify-between items-center">
