@@ -21,7 +21,7 @@ const ShoppingListing = () => {
   const [filters, setFilters] = useState({});
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].id);
 
-  //filter logic
+  //Filter logic
  const handleFilter = (section, option) => {
   console.log(section, option);
 
