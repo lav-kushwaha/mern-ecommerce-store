@@ -4,6 +4,8 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 
 const ShoppingProductTile = ({ product }) => {
+  const isOnSale = product?.salePrice > 0 && product?.salePrice < product?.price;
+
   return (
     <Card className="w-full max-w-sm mx-auto shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden border">
       <div>
@@ -11,10 +13,10 @@ const ShoppingProductTile = ({ product }) => {
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-xl"
+            className="w-full h-[300px] object-contain rounded-t-xl"
           />
-          {product?.salePrice > 0 && (
-            <Badge className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded-md">
+          {isOnSale && (
+            <Badge className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded-md shadow-sm">
               SALE
             </Badge>
           )}
@@ -28,10 +30,10 @@ const ShoppingProductTile = ({ product }) => {
           </div>
 
           <div className="flex justify-between items-center">
-            <span className={`${product?.salePrice > 0 ? 'line-through text-gray-400' : 'text-primary'} text-base font-semibold`}>
+            <span className={`${isOnSale ? 'line-through text-gray-400' : 'text-primary'} text-base font-semibold`}>
               ₹{product?.price}
             </span>
-            {product?.salePrice > 0 && (
+            {isOnSale && (
               <span className="text-base font-bold text-green-600">
                 ₹{product?.salePrice}
               </span>
