@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ProductFilter from '../../components/shopping-view/filter';
 import {
   DropdownMenu,
@@ -20,57 +20,64 @@ function createSearchParamsHelper(filterParams) {
   const queryParams = [];
   for (const [key, value] of Object.entries(filterParams)) {
     if (Array.isArray(value) && value.length > 0) {
-      const paramValue = value.join(',');
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+        const paramValue = value.join(',');
+        queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
   return queryParams.join('&');
 }
 
 const ShoppingListing = () => {
-  const { productList } = useSelector((state) => state.shopProducts);
   const dispatch = useDispatch();
+  const { productList, loading } = useSelector((state) => state.shopProducts);
 
   const [filters, setFilters] = useState({});
-  const [selectedSort, setSelectedSort] = useState(null);
+  const [selectedSort, setSelectedSort] = useState(sortOptions[0].id);
   const [searchParams, setSearchParams] = useSearchParams();
-
   const categorySearchParam = searchParams.get("category");
 
+  //Prevent unnecessary re-renders
+  const productCount = useMemo(() => productList?.length || 0, [productList]);
 
   const handleFilter = (section, option) => {
-    const updateFilter = { ...filters };
-    const options = updateFilter[section] || [];
+    const updatedFilters = { ...filters };
+    const options = updatedFilters[section] || [];
 
     if (options.includes(option)) {
-      updateFilter[section] = options.filter((item) => item !== option);
+      updatedFilters[section] = options.filter((item) => item !== option);
     } else {
-      updateFilter[section] = [...options, option];
+      updatedFilters[section] = [...options, option];
     }
 
-    setFilters(updateFilter);
-    sessionStorage.setItem('filters', JSON.stringify(updateFilter));
+    setFilters(updatedFilters);
+    sessionStorage.setItem('filters', JSON.stringify(updatedFilters));
   };
 
-   useEffect(() => {
-    if (filters && Object.keys(filters).length > 0) {
-      const createQueryString = createSearchParamsHelper(filters);
-      setSearchParams(new URLSearchParams(createQueryString));
-    }
-  }, [filters]);
-
+  // Load filters from sessionStorage when category changes
   useEffect(() => {
-    setSelectedSort(sortOptions[0].id)
-    const stored = JSON.parse(sessionStorage.getItem('filters')) || {};
-    setFilters(stored);
-  }, [categorySearchParam]);
+      const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {};
+      setFilters(storedFilters);
+  }, [categorySearchParam, dispatch, selectedSort]);
 
-   useEffect(() => {
-    if (filters !== null && selectedSort !== null)
+  // Update URL params on filter change
+  useEffect(() => {
+    if (filters && Object.keys(filters).length > 0) {
+      const query = createSearchParamsHelper(filters);
+      setSearchParams(new URLSearchParams(query), { replace: true });
+    }
+  }, [filters, setSearchParams]);
+
+  // Fetch products when filters or sort change
+  useEffect(() => {
+    if (filters !== null && selectedSort !== null) {
       dispatch(
-        fetchAllFilteredProducts({ filterParams: filters, sortParams: selectedSort })
+        fetchAllFilteredProducts({
+          filterParams: filters,
+          sortParams: selectedSort,
+        })
       );
-  }, [dispatch, selectedSort, filters]);
+    }
+  }, [dispatch, filters, selectedSort]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 p-4 md:p-6">
@@ -84,7 +91,7 @@ const ShoppingListing = () => {
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
-              {productList?.length || 0} Products
+              {productCount} Products
             </span>
 
             {/* Sort Menu */}
@@ -118,7 +125,9 @@ const ShoppingListing = () => {
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {productList && productList.length > 0 ? (
+          {loading ? (
+            <p className="text-center col-span-full py-8">Loading products...</p>
+          ) : productList && productList.length > 0 ? (
             productList.map((productItem) => (
               <ShoppingProductTile key={productItem?._id} product={productItem} />
             ))
