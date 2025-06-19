@@ -18,6 +18,8 @@ export const fetchAllFilteredProducts = createAsyncThunk(
       sortBy: sortParams,
     });
 
+    console.log(query)
+
     const result = await axios.get(
       `http://localhost:5000/api/shop/products/get?${query}`
     );
