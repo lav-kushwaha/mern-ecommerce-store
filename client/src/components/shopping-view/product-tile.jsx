@@ -5,7 +5,7 @@ import { Button } from '../ui/button'
 import { brandOptionsMap,categoryOptionsMap } from '../../config'
 
 
-const ShoppingProductTile = ({ product }) => {
+const ShoppingProductTile = ({ product, cartBtn=true }) => {
   const isOnSale = product?.salePrice > 0 && product?.salePrice < product?.price;
 
   return (
@@ -13,7 +13,7 @@ const ShoppingProductTile = ({ product }) => {
       <div>
         <div className="relative">
           <img
-            src={product?.image}
+            src={product?.images[0]}
             alt={product?.title}
             className="w-full h-[300px] object-contain rounded-t-xl"
           />
@@ -43,11 +43,11 @@ const ShoppingProductTile = ({ product }) => {
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0">
+        {cartBtn?<CardFooter className="p-4 pt-0">
           <Button className="w-full text-white">
-            Add To Cart
+           Add To Cart
           </Button>
-        </CardFooter>
+        </CardFooter>:""}
       </div>
     </Card>
   )
