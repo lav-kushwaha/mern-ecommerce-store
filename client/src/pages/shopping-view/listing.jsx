@@ -13,7 +13,7 @@ import { sortOptions } from '../../config';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
 import ShoppingProductTile from '../../components/shopping-view/product-tile';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 
 function createSearchParamsHelper(filterParams) {
@@ -39,6 +39,7 @@ const ShoppingListing = () => {
   //Prevent unnecessary re-renders
   const productCount = useMemo(() => productList?.length || 0, [productList]);
 
+  //handle filters
   const handleFilter = (section, option) => {
     const updatedFilters = { ...filters };
     const options = updatedFilters[section] || [];
@@ -129,7 +130,7 @@ const ShoppingListing = () => {
             <p className="text-center col-span-full py-8">Loading products...</p>
           ) : productList && productList.length > 0 ? (
             productList.map((productItem) => (
-              <ShoppingProductTile key={productItem?._id} product={productItem} />
+             <Link to={`/shop/product-details/${productItem._id}`}><ShoppingProductTile key={productItem?._id} product={productItem}/></Link>
             ))
           ) : (
             <p className="text-center text-muted-foreground col-span-full py-8">
