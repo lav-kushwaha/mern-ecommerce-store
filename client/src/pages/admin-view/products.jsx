@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import AdminProductTile from "../../components/admin-view/product-tile";
 
 const initialFormData = {
-  image: null,
   title: "",
   description: "",
   category: "",
@@ -35,8 +34,7 @@ const AdminProducts = () => {
     useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
@@ -44,58 +42,58 @@ const AdminProducts = () => {
 
   const dispatch = useDispatch();
 
-  //add  and edit products
+  // Add or Edit Products
   function onSubmit(event) {
     event.preventDefault();
 
-    currentEditedId !== null
-      ? dispatch(
-          editProduct({
-            id: currentEditedId,
-            formData,
-          })
-        ).then((data) => {
-          console.log(data);
+    if (currentEditedId !== null) {
+      dispatch(
+        editProduct({
+          id: currentEditedId,
+          formData
+        })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          setFormData(initialFormData);
+          setUploadedImageUrls([]);
+          setOpenCreateProductsDialog(false);
+          setCurrentEditedId(null);
+          toast.success(data?.payload?.message);
+        }
+      });
+    } else {
+      dispatch(
+        addNewProduct({
+          ...formData,
+          images: uploadedImageUrls,
+        })
+      )
+        .then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
-            setFormData(initialFormData);
             setOpenCreateProductsDialog(false);
-            setCurrentEditedId(null);
+            setUploadedImageUrls([]);
+            setFormData(initialFormData);
             toast.success(data?.payload?.message);
           }
         })
-      : dispatch(
-          addNewProduct({
-            ...formData,
-            image: uploadedImageUrl,
-          })
-        )
-          .then((data) => {
-            console.log(data);
-            if (data?.payload?.success) {
-              dispatch(fetchAllProducts());
-              setOpenCreateProductsDialog(false);
-              setImageFile(null);
-              setFormData(initialFormData);
-              toast.success(data?.payload?.message);
-            }
-          })
-          .catch((err) => {
-            console.log(err.message);
-          });
+        .catch((err) => {
+          console.error("Failed to add product:", err);
+          toast.error("Failed to add product");
+        });
+    }
   }
 
-  function handleDelete(getCurrentProductId){
-    dispatch(deleteProduct(getCurrentProductId))
-    .then(data=>{
-        if(data?.payload?.success){
-          dispatch(fetchAllProducts());
-          toast.success(data?.payload?.message);
-        }
-    })
+  function handleDelete(productId) {
+    dispatch(deleteProduct(productId)).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchAllProducts());
+        toast.success(data?.payload?.message);
+      }
+    });
   }
-  
-  //check form valid
+
   function isFormValid() {
     return Object.keys(formData)
       .map((key) => formData[key] !== "")
@@ -118,18 +116,17 @@ const AdminProducts = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
-              <AdminProductTile
-                key={productItem._id}
-                product={productItem}
-                setFormData={setFormData}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setCurrentEditedId={setCurrentEditedId}
-                handleDelete={handleDelete}
-              />
-            ))
-          : null}
+        {productList?.length > 0 &&
+          productList.map((productItem) => (
+            <AdminProductTile
+              key={productItem._id}
+              product={productItem}
+              setFormData={setFormData}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setCurrentEditedId={setCurrentEditedId}
+              handleDelete={handleDelete}
+            />
+          ))}
       </div>
 
       <Sheet
@@ -138,6 +135,7 @@ const AdminProducts = () => {
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
           setFormData(initialFormData);
+          setUploadedImageUrls([]);
         }}
       >
         <SheetContent
@@ -151,10 +149,8 @@ const AdminProducts = () => {
           </SheetHeader>
 
           <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-            uploadedImageUrl={uploadedImageUrl}
-            setUploadedImageUrl={setUploadedImageUrl}
+            uploadedImageUrls={uploadedImageUrls}
+            setUploadedImageUrls={setUploadedImageUrls}
             setImageLoadingState={setImageLoadingState}
             imageLoadingState={imageLoadingState}
             isEditMode={currentEditedId !== null}
