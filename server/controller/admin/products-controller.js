@@ -1,84 +1,57 @@
 const { uploadImageToCloudinary } = require("../../helpers/cloudinary");
 const Product = require("../../model/Product");
 
+
+//Upload Image to cloudinary
 const handleImageUpload = async (req, res) => {
   try {
-
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded." });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: 'No files uploaded.' });
     }
 
-    // Convert buffer to Base64 Data URI
-    const base64 = Buffer.from(req.file.buffer).toString("base64");
-    const dataUri = `data:${req.file.mimetype};base64,${base64}`; //eg:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...ABJRU5ErkJggg==
+    const imageUrls = [];
 
-    // Upload to Cloudinary
-    const result = await uploadImageToCloudinary(dataUri);
+    for (const file of req.files) {
+      const base64 = Buffer.from(file.buffer).toString('base64');
+      const dataUri = `data:${file.mimetype};base64,${base64}`;
+      const result = await uploadImageToCloudinary(dataUri);
+      imageUrls.push(result.secure_url);
+    }
 
-    res.status(200).json({
-      success: true,
-      message: "Image uploaded successfully",
-      data: result,
-    });
+    res.status(200).json({ success: true, data: imageUrls });
 
   } catch (error) {
-    console.error("Image Upload Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Image upload failed",
-      error: error.message || "Unknown server error",
-    });
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Upload failed.' });
   }
 };
 
 // Add New Product
-const addProduct = async (req, res) => {
+const addProduct =  async (req, res) => {
   try {
-    const {
-      image,
-      title,
-      description,
-      category,
-      brand,
-      price,
-      salePrice,
-      totalStock,
-    } = req.body;
+    const { images, title, description, category, brand, price, salePrice, totalStock } = req.body;
 
-    if (!image || !title || !description || !category || !brand || !price || !salePrice || !totalStock) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required.",
-      });
+    if (!images || images.length === 0 || !title || !description || !category || !brand || !price || !salePrice || !totalStock) {
+      return res.status(400).json({ 
+          success: false, 
+          message: 'All fields are required including images.' 
+        });
     }
 
-    const newProduct = new Product({
-      image,
-      title,
-      description,
-      category,
-      brand,
-      price,
-      salePrice,
-      totalStock,
-    });
+    const product = new Product({ images, title, description, category, brand, price, salePrice, totalStock });
+    await product.save();
 
-    await newProduct.save();
-
-    res.status(201).json({
+    res.status(201).json({ 
       success: true,
-      message: "Product added successfully.",
-      data: newProduct,
+      message:"Product added successfully..",
+      data: product 
     });
 
   } catch (error) {
     console.error("Add Product Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error.",
-    });
+    res.status(500).json({ success: false, message: 'Internal server error.' });
   }
-};
+}
 
 // Fetch All Products
 const fetchAllProducts = async (req, res) => {
