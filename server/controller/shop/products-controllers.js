@@ -1,10 +1,12 @@
 const Product = require("../../model/Product");
 
+//product filter
 const getFilteredProducts = async (req, res) => {
   try {
-    const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;
 
-    let filters = {};//if its remain only empty obj means, it return all data.
+    const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;  // fallback default which is undefined, category === [] brand === [] if query is empty.
+
+    let filters = {}; //If filters is empty, returns all products sorted accordingly.
     
     if (category.length) {
       filters.category = { $in: category.split(",") };
@@ -12,7 +14,6 @@ const getFilteredProducts = async (req, res) => {
 
     if (brand.length) {
       filters.brand = { $in: brand.split(",") };
-      
     }
 
     let sort = {};
@@ -48,7 +49,7 @@ const getFilteredProducts = async (req, res) => {
       data: products,
     });
 
-  } catch (e) {
+  } catch (error) {
     console.log(error);
     res.status(500).json({
       success: false,
@@ -57,4 +58,38 @@ const getFilteredProducts = async (req, res) => {
   }
 };
 
-module.exports = { getFilteredProducts };
+const getProductDetails = async(req,res)=>{
+   try{
+    const {id} = req.params;
+
+    if(!id){
+      return res.status(400).json({
+        success:false,
+        message:"There is no product id.."
+      });
+    }
+
+    const productDetails = await Product.findById(id);
+
+    if(!productDetails){
+      return res.status(404).json({
+        success:false,
+        message:"Product not found!"
+      });
+    }
+
+    res.status(200).json({
+      success:true,
+      data:productDetails
+    });
+
+   }catch(err){
+    console.log(err);
+    return res.status(500).json({
+      success:false,
+      message:"Internal server error!"
+    })
+   }
+}
+
+module.exports = { getFilteredProducts, getProductDetails };
