@@ -18,6 +18,7 @@ import UnauthPage from "./pages/unauth-page"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect } from "react"
 import { checkAuth } from "./store/auth-slice"
+import ProductsDetails from "./components/shopping-view/products-details"
 
 function App() {
 
@@ -68,6 +69,7 @@ function App() {
               <Route path="listing" element={<ShoppingListing/>}/>
               <Route path="checkout" element={<ShoppingCheckout/>}/>
               <Route path="account" element={<ShoppingAccount/>}/>
+              <Route path="product-details/:id" element={<ProductsDetails/>}/>
            </Route>
            
            <Route path="*" element={<NotFound/>}/>
