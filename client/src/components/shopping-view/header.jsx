@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from '../ui/avatar';
 import { logoutUser } from '../../store/auth-slice';
 import { toast } from 'sonner';
 import { shoppingViewHeaderMenuItems } from '../../config';
+import UserCartWrapper from './cart-wrapper';
 
 function MenuItems() {
   return (
@@ -34,6 +35,7 @@ function MenuItems() {
 
 function HeaderRightContent({ isMobile = false }) {
   const { user } = useSelector((state) => state.auth);
+  const[openCartSheet,setOpenCartSheet] = useState(false);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -78,10 +80,14 @@ function HeaderRightContent({ isMobile = false }) {
 
   return (
     <div className="flex items-center gap-4">
-      <Button variant="outline" size="icon" className="cursor-pointer">
+     
+     <Sheet open={openCartSheet} onOpenChange={()=>setOpenCartSheet(false)}>
+       <Button onClick={()=>setOpenCartSheet(true)} variant="outline" size="icon" className="cursor-pointer">
         <ShoppingCart className="w-6 h-6" />
         <span className="sr-only">User cart</span>
       </Button>
+      <UserCartWrapper/>
+     </Sheet>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
