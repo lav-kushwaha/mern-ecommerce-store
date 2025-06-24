@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
@@ -16,6 +16,7 @@ import { logoutUser } from '../../store/auth-slice';
 import { toast } from 'sonner';
 import { shoppingViewHeaderMenuItems } from '../../config';
 import UserCartWrapper from './cart-wrapper';
+import { fetchCartItems } from '../../store/shop/cart-slice';
 
 function MenuItems() {
   return (
@@ -35,6 +36,7 @@ function MenuItems() {
 
 function HeaderRightContent({ isMobile = false }) {
   const { user } = useSelector((state) => state.auth);
+  const {cartItems} = useSelector((state)=>state.shopCart);
   const[openCartSheet,setOpenCartSheet] = useState(false);
   const dispatch = useDispatch();
 
@@ -49,6 +51,11 @@ function HeaderRightContent({ isMobile = false }) {
         console.log(err?.message);
       });
   };
+
+  //fetch cartItems to persist in cart.
+  useEffect(()=>{
+    dispatch(fetchCartItems({userId:user?._id}))
+  },[dispatch])
 
   const AccountLinks = (
     <>
@@ -86,7 +93,7 @@ function HeaderRightContent({ isMobile = false }) {
         <ShoppingCart className="w-6 h-6" />
         <span className="sr-only">User cart</span>
       </Button>
-      <UserCartWrapper/>
+      <UserCartWrapper cartItems={cartItems}/>
      </Sheet>
 
       <DropdownMenu>
