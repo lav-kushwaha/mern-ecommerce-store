@@ -3,14 +3,16 @@ import { Card, CardContent, CardFooter } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { brandOptionsMap,categoryOptionsMap } from '../../config'
+import { Link } from 'react-router-dom'
 
 
-const ShoppingProductTile = ({ product, cartBtn=true }) => {
+const ShoppingProductTile = ({ product, cartBtn=true, handleAddtoCart }) => {
   const isOnSale = product?.salePrice > 0 && product?.salePrice < product?.price;
 
   return (
     <Card className="w-full max-w-sm mx-auto shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden border">
       <div>
+      <Link to={`/shop/product-details/${product._id}`}>
         <div className="relative">
           <img
             src={product?.images[0]}
@@ -23,6 +25,7 @@ const ShoppingProductTile = ({ product, cartBtn=true }) => {
             </Badge>
           )}
         </div>
+          </Link>
 
         <CardContent className="p-4 space-y-2">
           <h2 className="text-lg font-semibold truncate">{product?.title}</h2>
@@ -44,12 +47,13 @@ const ShoppingProductTile = ({ product, cartBtn=true }) => {
         </CardContent>
 
         {cartBtn?<CardFooter className="p-4 pt-0">
-          <Button className="w-full text-white">
+          <Button onClick={()=>handleAddtoCart(product?._id)} className="w-full cursor-pointer text-white">
            Add To Cart
           </Button>
         </CardFooter>:""}
       </div>
     </Card>
+   
   )
 }
 
