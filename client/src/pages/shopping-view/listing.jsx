@@ -13,7 +13,9 @@ import { sortOptions } from '../../config';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
 import ShoppingProductTile from '../../components/shopping-view/product-tile';
-import { Link, useSearchParams } from 'react-router-dom';
+import {useSearchParams } from 'react-router-dom';
+import { addToCart, fetchCartItems } from '../../store/shop/cart-slice';
+import { toast } from 'sonner';
 
 
 function createSearchParamsHelper(filterParams) {
@@ -30,7 +32,7 @@ function createSearchParamsHelper(filterParams) {
 const ShoppingListing = () => {
   const dispatch = useDispatch();
   const { productList, loading } = useSelector((state) => state.shopProducts);
-
+  const {user} = useSelector((state)=>state.auth)
   const [filters, setFilters] = useState({});
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].id);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,6 +55,17 @@ const ShoppingListing = () => {
     setFilters(updatedFilters);
     sessionStorage.setItem('filters', JSON.stringify(updatedFilters));
   };
+
+  //add to cart
+  function handleAddtoCart(getCurrentProductId){
+      dispatch(addToCart({userId:user?._id,productId:getCurrentProductId,quantity:1}))
+      .then((data)=>{
+        if(data?.payload?.success){
+          dispatch(fetchCartItems({userId:user?._id}))
+          toast.success(data?.payload?.message);
+        }
+      })
+  }
 
   // Load filters from sessionStorage when category changes
   useEffect(() => {
@@ -130,7 +143,7 @@ const ShoppingListing = () => {
             <p className="text-center col-span-full py-8">Loading products...</p>
           ) : productList && productList.length > 0 ? (
             productList.map((productItem) => (
-             <Link to={`/shop/product-details/${productItem._id}`}><ShoppingProductTile key={productItem?._id} product={productItem}/></Link>
+              <ShoppingProductTile key={productItem?._id} product={productItem} handleAddtoCart={handleAddtoCart}/>
             ))
           ) : (
             <p className="text-center text-muted-foreground col-span-full py-8">
