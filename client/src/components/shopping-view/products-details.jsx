@@ -6,9 +6,12 @@ import {
   fetchRecommendations,
 } from '../../store/shop/products-slice';
 import ShoppingProductTile from './product-tile';
+import { addToCart, fetchCartItems } from '../../store/shop/cart-slice';
+import { toast } from 'sonner';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const {user} = useSelector((state)=>state.auth)
   const dispatch = useDispatch();
 
   const { productDetails, recommendations, isLoadingRecommendations } = useSelector(
@@ -18,6 +21,17 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef(null);
+
+  //add to cart
+  function handleAddtoCart(){
+      dispatch(addToCart({userId:user?._id,productId:id,quantity:1}))
+      .then((data)=>{
+        if(data?.payload?.success){
+          dispatch(fetchCartItems({userId:user?._id}))
+          toast.success(data?.payload?.message);
+        }
+      })
+  }
 
   useEffect(() => {
     dispatch(fetchProductDetails({ id }));
@@ -146,7 +160,7 @@ const ProductDetails = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-            <button className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition">
+            <button onClick={handleAddtoCart} className="w-full cursor-pointer sm:w-auto px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition">
               Add to Cart
             </button>
             <button className="w-full sm:w-auto px-6 py-3 border border-black rounded hover:bg-gray-100 transition">
