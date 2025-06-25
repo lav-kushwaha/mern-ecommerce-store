@@ -9,7 +9,6 @@ function UserCartWrapper({ cartItems }) {
     return acc + price * item.quantity;
   }, 0);
 
-
   return (
     <SheetContent className="sm:max-w-md p-0 flex flex-col h-full">
       {/* Header */}
