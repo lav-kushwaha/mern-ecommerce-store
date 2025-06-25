@@ -112,7 +112,8 @@ const fetchCartItems = async (req, res) => {
 const updateCartItemQty = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
-
+    console.log(userId, productId, quantity);
+    
     if (!userId || !productId || quantity <= 0) {
       return res.status(400).json({
         success: false,
@@ -162,6 +163,7 @@ const updateCartItemQty = async (req, res) => {
         ...cart._doc,
         items: populateCartItems,
       },
+      message: "Cart Quantity Updated!",
     });
   } catch (error) {
     console.log(error);
