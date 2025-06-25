@@ -36,12 +36,6 @@ function handleUpdateQuantity(getCartItem, typeOfAction) {
   const currentQty = getCartItem?.quantity;
   const newQty = typeOfAction === 'add' ? currentQty + 1 : currentQty - 1;
 
-  // // Prevent quantity from going below 1
-  // if (newQty < 0) {
-  //   toast.warning("Minimum quantity is 1");
-  //   return;
-  // }
-
   dispatch(updateCartQuantity({
     userId: user?._id,
     productId: getCartItem?.productId,
