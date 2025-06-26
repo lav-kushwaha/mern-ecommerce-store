@@ -32,7 +32,7 @@ function App() {
    if(isLoading) return <div>Loading..</div>
 
   return (
-    <div className="flex flex-col overflow-hidden bg-white">
+    <div className="flex flex-col overflow-hidden bg-black">
         <Routes>
 
             {/* auth components */}
