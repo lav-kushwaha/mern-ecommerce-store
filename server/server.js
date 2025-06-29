@@ -7,6 +7,7 @@ const authRouter = require('./routes/auth/auth-routes.js');
 const adminProductsRouter = require('../server/routes/admin/products-routes.js')
 const shopProductsRouter = require("../server/routes/shop/products-routes.js")
 const shopCartRouter = require('../server/routes/shop/cart-routes.js')
+const shopAddressRouter = require('../server/routes/shop/address-routes.js')
 
 
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/auth",authRouter);
 app.use("/api/admin/products",adminProductsRouter);
 app.use("/api/shop/products",shopProductsRouter);  
 app.use("/api/shop/cart",shopCartRouter);  
+app.use('/api/shop/address',shopAddressRouter)
 
 
 //connecting DB

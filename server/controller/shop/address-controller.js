@@ -52,13 +52,6 @@ const fetchAllAddress = async (req, res) => {
 
     const addressList = await Address.find({ userId });
 
-    if (!addressList || addressList.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No addresses found for this user.",
-      });
-    }
-
     return res.status(200).json({
       success: true,
       data: addressList,

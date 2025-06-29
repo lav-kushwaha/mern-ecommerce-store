@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,16 +19,30 @@ import UserCartWrapper from './cart-wrapper';
 import { fetchCartItems } from '../../store/shop/cart-slice';
 
 function MenuItems() {
+  const navigate = useNavigate();
+
+  function handleNavigate(getCurrentMenuItem){
+    sessionStorage.removeItem("filters");
+    const currentFilter = getCurrentMenuItem.id !=='home'? 
+    {
+      category:[getCurrentMenuItem.id]
+    }
+    : null 
+    sessionStorage.setItem('filters',JSON.stringify(currentFilter));
+    navigate(getCurrentMenuItem.path);
+  }
+
   return (
     <nav className="flex flex-col gap-4 lg:gap-6 lg:flex-row lg:items-center">
       {shoppingViewHeaderMenuItems.map((item) => (
-        <Link
+        <label
+          onClick={()=>handleNavigate(item)}
           key={item.id}
           to={item.path}
-          className="font-medium text-[18px] hover:text-gray-500 transition-colors"
+          className="font-medium cursor-pointer text-[18px] hover:text-gray-500 transition-colors"
         >
           {item.label}
-        </Link>
+        </label>
       ))}
     </nav>
   );
