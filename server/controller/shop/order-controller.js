@@ -14,9 +14,20 @@ const createOrder = async (req, res) => {
       cartId,
     } = req.body;
 
-    // Create PayPal order
-    const paypalOrder = await paypal.createPaypalOrder(totalAmount);
+    if (
+      !addressInfo?.address ||
+      !addressInfo?.city ||
+      !addressInfo?.pincode ||
+      !addressInfo?.phone ||
+      !addressInfo?.addressId
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing addressInfo fields.",
+      });
+    }
 
+    // 1. Save the order first (with no PayPal order ID yet)
     const newlyCreatedOrder = new Order({
       userId,
       cartId,
@@ -28,9 +39,18 @@ const createOrder = async (req, res) => {
       totalAmount,
       orderDate: new Date(),
       orderUpdateDate: new Date(),
-      paymentId: paypalOrder.id,
     });
 
+    await newlyCreatedOrder.save();
+
+    // 2. Now create the PayPal order using the order ID
+    const paypalOrder = await paypal.createPaypalOrder(totalAmount, {
+      return_url: `http://localhost:5173/shop/paypal-success?orderId=${newlyCreatedOrder._id}`,
+      cancel_url: 'http://localhost:5173/shop/checkout',
+    });
+
+    // 3. Save the PayPal payment ID to the order
+    newlyCreatedOrder.paymentId = paypalOrder.id;
     await newlyCreatedOrder.save();
 
     const approvalLink = paypalOrder.links.find(
@@ -42,7 +62,7 @@ const createOrder = async (req, res) => {
       approvalURL: approvalLink,
       orderId: newlyCreatedOrder._id,
     });
-    
+
   } catch (e) {
     console.error(e);
     res.status(500).json({
@@ -56,7 +76,13 @@ const capturePayment = async (req, res) => {
   try {
     const { orderID, orderId } = req.body;
 
+    console.log(orderID, orderId);
+    
+
     const captureData = await paypal.capturePaypalOrder(orderID);
+
+    console.log(captureData, "capdata");
+    
 
     const order = await Order.findById(orderId);
     if (!order) {
