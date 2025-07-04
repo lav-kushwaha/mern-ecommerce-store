@@ -12,10 +12,13 @@ const ShoppingCheckout = () => {
   const {cartItems} = useSelector((state)=>state.shopCart);
   const {items} = cartItems;
   const {user} = useSelector((state)=>state.auth);
+  const {approvalURL} = useSelector((state)=>state.shoppingOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
+  const [isPaymentStart, setIsPaymentStart] = useState(false);
   const dispatch = useDispatch();
 
-  // console.log(cartItems,"item");
+  console.log(approvalURL);
+  
 
  const totalPrice = cartItems?.items?.reduce((acc, item) => {
     const price = item?.salePrice > 0 ? item.salePrice : item.price;
@@ -24,6 +27,10 @@ const ShoppingCheckout = () => {
   
   
    function handleInitiatePaypalPayment(){
+      if(currentSelectedAddress==null){
+        toast.warning("Please select the address!");
+        return;
+      }
       const orderData = {
         userId: user?._id,
         cartId: cartItems?._id,
@@ -56,8 +63,17 @@ const ShoppingCheckout = () => {
 
       dispatch(createNewOrder(orderData)).then((data)=>{
           console.log(data, "Lav")
+          if(data?.payload?.success){
+            setIsPaymentStart(true);
+          }else{
+            setIsPaymentStart(false);
+          }
       })
       
+   }
+
+   if(approvalURL){
+     window.location.href = approvalURL;
    }
 
   return (
@@ -81,7 +97,7 @@ const ShoppingCheckout = () => {
           </div>
         </div>
         <div className="mt-4 w-full">
-          <Button onClick={handleInitiatePaypalPayment} className="w-full">Checkout With Paypal</Button>
+          <Button onClick={handleInitiatePaypalPayment} className="w-full cursor-pointer">Checkout With Paypal</Button>
         </div>
         </div>
       </div>
