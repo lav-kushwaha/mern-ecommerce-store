@@ -1,12 +1,35 @@
 import React from 'react'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, CheckCircle } from 'lucide-react'
 
-const AddressCard = ({ addressInfo, handleEditAddress ,handleDeleteAddress }) => {
+const AddressCard = ({
+  addressInfo,
+  selectedAddressId,
+  setCurrentSelectedAddress,
+  handleEditAddress,
+  handleDeleteAddress
+}) => {
+
+  const isSelected = selectedAddressId === addressInfo._id
+
   return (
-    <Card className="relative group flex flex-col justify-between h-full rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md">
+    <Card
+      onClick={() => setCurrentSelectedAddress?.(addressInfo)}
+      className={`relative group flex flex-col justify-between h-full rounded-lg border transition-all cursor-pointer ${
+        isSelected
+          ? 'border-blue-600 ring-2 ring-blue-300/40 shadow-lg bg-blue-50'
+          : 'border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300'
+      }`}
+    >
       <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
+        {/* Selected Tag */}
+        {isSelected && (
+          <div className="absolute top-2 right-2 text-xs font-semibold text-blue-600 flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full">
+            <CheckCircle className="w-4 h-4" />
+            Selected
+          </div>
+        )}
 
         {/* Address Details */}
         <div className="space-y-1 text-sm text-gray-800">
@@ -34,7 +57,10 @@ const AddressCard = ({ addressInfo, handleEditAddress ,handleDeleteAddress }) =>
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleEditAddress(addressInfo)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleEditAddress(addressInfo)
+            }}
             className="flex items-center gap-1 text-sm"
           >
             <Pencil className="w-4 h-4" />
@@ -43,7 +69,10 @@ const AddressCard = ({ addressInfo, handleEditAddress ,handleDeleteAddress }) =>
           <Button
             size="sm"
             variant="destructive"
-            onClick={() => handleDeleteAddress(addressInfo)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDeleteAddress(addressInfo)
+            }}
             className="flex items-center gap-1 text-sm"
           >
             <Trash2 className="w-4 h-4" />
