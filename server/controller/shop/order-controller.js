@@ -74,8 +74,8 @@ const createOrder = async (req, res) => {
 
 const capturePayment = async (req, res) => {
   try {
-    const { orderID, orderId } = req.body;
-
+    const { orderID, orderId } = req.body; 
+    
     console.log(orderID, orderId);
     
 
