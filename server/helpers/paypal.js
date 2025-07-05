@@ -1,5 +1,4 @@
 const axios = require('axios');
-
 const PAYPAL_API = process.env.PAYPAL_API;
 const CLIENT = process.env.PAYPAL_CLIENT_ID;
 const SECRET = process.env.PAYPAL_CLIENT_SECRET;
@@ -23,21 +22,23 @@ const getAccessToken = async () => {
 };
 
 // Create PayPal order
-const createPaypalOrder = async (amount) => {
+const createPaypalOrder = async (amount, redirectUrls) => {
   const accessToken = await getAccessToken();
 
   const response = await axios.post(
     `${PAYPAL_API}/v2/checkout/orders`,
     {
       intent: 'CAPTURE',
-      purchase_units: [
-        {
-          amount: {
-            currency_code: 'USD',
-            value: amount.toFixed(2),
-          },
+      purchase_units: [{
+        amount: {
+          currency_code: 'USD',
+          value: amount.toFixed(2),
         },
-      ],
+      }],
+      application_context: {
+        return_url: redirectUrls.return_url,
+        cancel_url: redirectUrls.cancel_url,
+      },
     },
     {
       headers: {
@@ -48,6 +49,7 @@ const createPaypalOrder = async (amount) => {
 
   return response.data;
 };
+
 
 // Capture PayPal payment
 const capturePaypalOrder = async (orderID) => {
