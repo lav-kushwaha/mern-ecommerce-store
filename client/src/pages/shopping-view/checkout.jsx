@@ -15,10 +15,7 @@ const ShoppingCheckout = () => {
   const {approvalURL} = useSelector((state)=>state.shoppingOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [isPaymentStart, setIsPaymentStart] = useState(false);
-  const dispatch = useDispatch();
-
-  console.log(approvalURL);
-  
+  const dispatch = useDispatch();  
 
  const totalPrice = cartItems?.items?.reduce((acc, item) => {
     const price = item?.salePrice > 0 ? item.salePrice : item.price;
@@ -27,10 +24,16 @@ const ShoppingCheckout = () => {
   
   
    function handleInitiatePaypalPayment(){
-      if(currentSelectedAddress==null){
-        toast.warning("Please select the address!");
+      if(items.length == 0){
+        toast.warning("Your cart is empty. Please add items to proceed!");
         return;
       }
+
+      if(currentSelectedAddress==null){
+        toast.warning("Please select or add the address to proceed!");
+        return;
+      }
+
       const orderData = {
         userId: user?._id,
         cartId: cartItems?._id,
@@ -59,10 +62,7 @@ const ShoppingCheckout = () => {
         payerId: "",
       };
  
-      console.log(orderData);
-
       dispatch(createNewOrder(orderData)).then((data)=>{
-          console.log(data, "Lav")
           if(data?.payload?.success){
             setIsPaymentStart(true);
           }else{
@@ -93,7 +93,7 @@ const ShoppingCheckout = () => {
          <div className='mt-8 space-y-4'> 
           <div className='flex justify-between'>
             <span className='font-bold'>Total</span>
-            <span className='font-bold'>₹{totalPrice}</span>
+            <span className='font-bold'>${totalPrice}</span>
           </div>
         </div>
         <div className="mt-4 w-full">
