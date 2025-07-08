@@ -7,6 +7,7 @@ const createOrder = async (req, res) => {
   try {
     const {
       userId,
+      userName,
       cartItems,
       addressInfo,
       paymentMethod,
@@ -27,15 +28,23 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // 1. Save the order first (with no PayPal order ID yet)
+    // Step 1: Create order without payment ID
     const newlyCreatedOrder = new Order({
       userId,
+      userName,
       cartId,
       cartItems,
-      addressInfo,
-      orderStatus: 'pending',
+      addressInfo: {
+        addressId: addressInfo.addressId,
+        address: addressInfo.address,
+        city: addressInfo.city,
+        pincode: addressInfo.pincode,
+        phone: addressInfo.phone,
+        notes: addressInfo.notes || "",
+      },
+      orderStatus: "pending",
       paymentMethod,
-      paymentStatus: 'unpaid',
+      paymentStatus: "unpaid",
       totalAmount,
       orderDate: new Date(),
       orderUpdateDate: new Date(),
@@ -43,18 +52,18 @@ const createOrder = async (req, res) => {
 
     await newlyCreatedOrder.save();
 
-    // 2. Now create the PayPal order using the order ID
+    // Step 2: Create PayPal order
     const paypalOrder = await paypal.createPaypalOrder(totalAmount, {
       return_url: `http://localhost:5173/shop/paypal-success?orderId=${newlyCreatedOrder._id}`,
-      cancel_url: 'http://localhost:5173/shop/checkout',
+      cancel_url: "http://localhost:5173/shop/checkout",
     });
 
-    // 3. Save the PayPal payment ID to the order
+    // Step 3: Save PayPal payment ID
     newlyCreatedOrder.paymentId = paypalOrder.id;
     await newlyCreatedOrder.save();
 
     const approvalLink = paypalOrder.links.find(
-      (link) => link.rel === 'approve'
+      (link) => link.rel === "approve"
     )?.href;
 
     res.status(201).json({
@@ -74,17 +83,12 @@ const createOrder = async (req, res) => {
 
 const capturePayment = async (req, res) => {
   try {
-    const { orderID, orderId } = req.body; 
+    const { orderID, orderId } = req.body;  
     
-    console.log(orderID, orderId);
-    
+    const captureData = await paypal.capturePaypalOrder(orderID);    
 
-    const captureData = await paypal.capturePaypalOrder(orderID);
+    const order = await Order.findById(orderId); //order db _id.
 
-    console.log(captureData, "capdata");
-    
-
-    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -128,32 +132,32 @@ const capturePayment = async (req, res) => {
   }
 };
 
-const getAllOrdersByUser = async(req,res)=>{
-  try{
+const getAllOrdersByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
-      const {userId} = req.params;
-      const orders = await Order.find({userId});
+    const orders = await Order.find({ userId }); 
+      
+    if (!orders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found!",
+      });
+    }
 
-      if(!orders.length){
-        return res.status(404).json({
-          success:false,
-          message:"No orders found!"
-        });
-      }
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
 
-      res.status(200).json({
-        success:true,
-        data:orders
-      })
-
-  }catch(error){
-    console.log(error);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
     res.status(500).json({
-      success:false,
-      message:"some error occured!"
-    })
+      success: false,
+      message: "Some error occurred!",
+    });
   }
-}
+};
 
 const getOrderDetails = async(req,res)=>{
   try{
