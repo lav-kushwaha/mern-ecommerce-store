@@ -36,11 +36,11 @@ const ShoppingProductTile = ({ product, cartBtn=true, handleAddtoCart }) => {
 
           <div className="flex justify-between items-center">
             <span className={`${isOnSale ? 'line-through text-gray-400' : 'text-primary'} text-base font-semibold`}>
-              ₹{product?.price}
+              ${product?.price}
             </span>
             {isOnSale && (
               <span className="text-base font-bold text-green-600">
-                ₹{product?.salePrice}
+                ${product?.salePrice}
               </span>
             )}
           </div>

@@ -4,7 +4,6 @@ const OrderConfirmed = () => {
   const { orderId } = useParams();
   const [params] = useSearchParams();
   const status = params.get("status");
-
   const isSuccess = status === "success";
 
   return (

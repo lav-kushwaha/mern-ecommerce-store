@@ -36,6 +36,7 @@ const ShoppingCheckout = () => {
 
       const orderData = {
         userId: user?._id,
+        userName:user?.userName,
         cartId: cartItems?._id,
         cartItems: items?.map((singleCartItem) => ({
           productId:singleCartItem?.productId,
@@ -63,6 +64,8 @@ const ShoppingCheckout = () => {
       };
  
       dispatch(createNewOrder(orderData)).then((data)=>{
+          console.log(data, "cretateneworder");
+          
           if(data?.payload?.success){
             setIsPaymentStart(true);
           }else{

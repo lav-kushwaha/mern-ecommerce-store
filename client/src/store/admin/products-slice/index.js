@@ -19,10 +19,7 @@ export const addNewProduct = createAsyncThunk(
           "Content-Type": "application/json",
         },
       }
-    );
-
-    console.log(result, +"product API");
-    
+    );    
 
     return result?.data;
   }

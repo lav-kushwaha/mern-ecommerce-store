@@ -1,13 +1,18 @@
 import { SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-items-content";
+import { useNavigate } from "react-router-dom";
 
-function UserCartWrapper({ cartItems }) {
+function UserCartWrapper({ cartItems, setOpenCartSheet }) {
+
+
+  const navigate = useNavigate();
 
   const totalPrice = cartItems?.items?.reduce((acc, item) => {
     const price = item?.salePrice > 0 ? item.salePrice : item.price;
     return acc + price * item.quantity;
   }, 0);
+
 
   return (
     <SheetContent className="sm:max-w-md p-0 flex flex-col h-full">
@@ -37,9 +42,12 @@ function UserCartWrapper({ cartItems }) {
         <div className="border-t px-6 py-4 bg-white sticky bottom-0">
           <div className="flex justify-between text-lg font-semibold mb-3">
             <span>Total</span>
-            <span>₹{totalPrice.toFixed(2)}</span>
+            <span>${totalPrice.toFixed(2)}</span>
           </div>
-          <Button className="w-full" onClick={() => { /* navigate("/checkout") */ }}>
+          <Button className="w-full cursor-pointer" onClick={() =>{
+            navigate("/shop/checkout")
+            setOpenCartSheet(false)
+            }}>
             Proceed to Checkout
           </Button>
         </div>

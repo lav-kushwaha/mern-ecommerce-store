@@ -5,8 +5,9 @@ import { captureOrder } from "../../store/shop/order-slice";
 
 const PaypalSuccess = () => {
   const [params] = useSearchParams();
-  const orderID = params.get("token");
-  const orderId = params.get("orderId");
+  const orderID = params.get("token"); //PayPal ID
+  const orderId = params.get("orderId"); //database Id
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -14,6 +15,8 @@ const PaypalSuccess = () => {
     if (orderID && orderId) {
       dispatch(captureOrder({ orderID, orderId }))
         .then((action) => {
+          console.log(action, "captureOrder");
+          
           const status = action.type.endsWith("fulfilled") ? "success" : "failed";
           navigate(`/shop/order-confirmed/${orderId}?status=${status}`);
         })

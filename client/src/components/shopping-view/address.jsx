@@ -20,20 +20,28 @@ const initialAddressFormData = {
   notes: ''
 }
 
-const Address = () => {
+const Address = ({ setCurrentSelectedAddress }) => {
   const [formData, setFormData] = useState(initialAddressFormData)
-  const [currentEditId, setCurrentEditId] = useState(null) 
+  const [currentEditId, setCurrentEditId] = useState(null)
+  const [selectedAddressId, setSelectedAddressId] = useState(null)
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
   const { addressList } = useSelector((state) => state.shopAddress)
 
-  // Handle Add or Edit submission
-  function handleManageAddress(event) {
-    event.preventDefault();
 
-    if(addressList.length>=3 && currentEditId===null){
-      toast.warning("You can add max 3 addresses!");
-      return;
+  // Fetch address list
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(fetchAllAddresses(user._id))
+    }
+  }, [dispatch, user?._id])
+
+  const handleManageAddress = (e) => {
+    e.preventDefault()
+
+    if (addressList.length >= 3 && currentEditId === null) {
+      toast.warning('You can add max 3 addresses!')
+      return
     }
 
     if (currentEditId !== null) {
@@ -63,8 +71,7 @@ const Address = () => {
     }
   }
 
-  //Populate form for editing
-  function handleEditAddress(address) {
+  const handleEditAddress = (address) => {
     setCurrentEditId(address?._id)
     setFormData({
       address: address?.address || '',
@@ -75,32 +82,32 @@ const Address = () => {
     })
   }
 
-  // Handle delete
-  function handleDeleteAddress(address) {
+  const handleDeleteAddress = (address) => {
     dispatch(deleteAddress({ userId: user?._id, addressId: address?._id }))
       .then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllAddresses(user._id))
           toast.success(data?.payload?.message)
+
+          if (selectedAddressId === address._id) {
+            setSelectedAddressId(null)
+            localStorage.removeItem('selected_address_id')
+          }
         }
       })
   }
 
-  function isFormValid() {
-    return Object.values(formData)
-      .map((val) => val.trim() !== '')
-      .every(Boolean)
+  const handleSelectAddress = (address) => {
+    setSelectedAddressId(address._id)
+    setCurrentSelectedAddress?.(address)
   }
 
-  useEffect(() => {
-    if (user?._id) {
-      dispatch(fetchAllAddresses(user._id))
-    }
-  }, [dispatch, user?._id])
+  const isFormValid = () =>
+    Object.values(formData).map((val) => val.trim() !== '').every(Boolean)
 
   return (
     <div className="space-y-6">
-      {/* Address List Section */}
+      {/* Saved Addresses */}
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Saved Addresses</CardTitle>
@@ -108,10 +115,12 @@ const Address = () => {
         <CardContent>
           {addressList && addressList.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {addressList.map((address, index) => (
+              {addressList.map((address) => (
                 <AddressCard
-                  key={index}
+                  key={address._id}
                   addressInfo={address}
+                  selectedAddressId={selectedAddressId}
+                  setCurrentSelectedAddress={handleSelectAddress}
                   handleEditAddress={handleEditAddress}
                   handleDeleteAddress={handleDeleteAddress}
                 />

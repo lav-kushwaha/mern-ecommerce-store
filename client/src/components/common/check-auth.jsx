@@ -1,10 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 
 function CheckAuth({ isAuthenticated, user, children }) {
-  const location = useLocation();
-
-  // console.log(isAuthenticated,user);
-  
+  const location = useLocation();  
   
   // 1. If NOT authenticated and trying to access protected routes, redirect to login
   if (

@@ -18,7 +18,10 @@ import UnauthPage from "./pages/unauth-page"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect } from "react"
 import { checkAuth } from "./store/auth-slice"
-import ProductsDetails from "./components/shopping-view/products-details"
+import ProductsDetails from "./pages/shopping-view/products-details"
+import PaypalSuccess from "./pages/shopping-view/PaypalSuccess"
+import OrderConfirmed from "./pages/shopping-view/OrderConfirmed"
+
 
 function App() {
 
@@ -70,6 +73,8 @@ function App() {
               <Route path="checkout" element={<ShoppingCheckout/>}/>
               <Route path="account" element={<ShoppingAccount/>}/>
               <Route path="product-details/:id" element={<ProductsDetails/>}/>
+              <Route path="paypal-success" element={<PaypalSuccess />} />
+              <Route path="order-confirmed/:orderId" element={<OrderConfirmed/>} />
            </Route>
            
            <Route path="*" element={<NotFound/>}/>

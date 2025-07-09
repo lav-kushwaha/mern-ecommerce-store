@@ -63,9 +63,9 @@ function handleUpdateQuantity(getCartItem, typeOfAction) {
           {title}
         </h3>
         <p className="text-sm text-muted-foreground">
-          ₹{salePrice > 0 ? salePrice : price} × {quantity}
+          ${salePrice > 0 ? salePrice : price} × {quantity}
         </p>
-        <p className="text-sm font-semibold text-primary">Total: ₹{itemTotal}</p>
+        <p className="text-sm font-semibold text-primary">Total: ${itemTotal}</p>
 
         {/* Quantity Controls */}
         <div className="flex items-center gap-2 mt-1">

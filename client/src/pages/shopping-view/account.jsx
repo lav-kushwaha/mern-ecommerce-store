@@ -2,10 +2,11 @@ import React from 'react'
 import accImg from '../../assets/account.jpg'
 import { Tabs } from '../../components/ui/tabs'
 import { TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
-import Orders from '../../components/shopping-view/orders'
 import Address from '../../components/shopping-view/address'
+import ShoppingOrders from '../../components/shopping-view/orders'
 
 const ShoppingAccount = () => {
+
   return (
     <div className="flex flex-col min-h-screen items-center bg-gray-50">
       {/* Full-Width Banner */}
@@ -39,7 +40,7 @@ const ShoppingAccount = () => {
 
             {/* Tabs Content */}
             <TabsContent value="orders">
-              <Orders />
+              <ShoppingOrders/>
             </TabsContent>
             <TabsContent value="address">
               <Address />
