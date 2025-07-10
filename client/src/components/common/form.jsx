@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 
-const CommonForm = ({formControls, formData, setFormData, onSubmit, buttonText,isBtnDisabled}) => {
+const CommonForm = ({formControls, formData, setFormData, onSubmit, buttonText, isBtnDisabled}) => {
 
     function renderInputsByComponentType(getControlItem){
         let element = null;

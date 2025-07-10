@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+  HousePlug,
+  LogOut,
+  Menu,
+  ShoppingCart,
+  UserCog,
+} from 'lucide-react';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,65 +29,130 @@ import { shoppingViewHeaderMenuItems } from '../../config';
 import UserCartWrapper from './cart-wrapper';
 import { fetchCartItems } from '../../store/shop/cart-slice';
 
-function MenuItems() {
+function MenuItems({ onNavigate }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  function handleNavigate(getCurrentMenuItem){
-    sessionStorage.removeItem("filters");
-    const currentFilter = getCurrentMenuItem.id !=='home'? 
-    {
-      category:[getCurrentMenuItem.id]
+  const handleNavigate = (item) => {
+    sessionStorage.removeItem('filters');
+    const filter =
+      item.id !== 'home' && item.id !== 'products'
+        ? { category: [item.id] }
+        : null;
+
+    sessionStorage.setItem('filters', JSON.stringify(filter));
+
+    if (location.pathname.includes('listing') && filter !== null) {
+      setSearchParams(new URLSearchParams(`?category=${item.id}`));
+    } else {
+      navigate(item.path);
     }
-    : null 
-    sessionStorage.setItem('filters',JSON.stringify(currentFilter));
-    navigate(getCurrentMenuItem.path);
-  }
+
+    onNavigate?.();
+  };
+
+  const isItemActive = (item) => {
+    if (item.id === 'home') return location.pathname === '/shop/home';
+    if (item.id === 'products') {
+      return location.pathname === '/shop/listing' && !searchParams.get('category');
+    }
+    if (
+      location.pathname === '/shop/listing' &&
+      searchParams.get('category') === item.id
+    ) {
+      return true;
+    }
+    if (item.id === 'search') {
+      return location.pathname === '/shop/search';
+    }
+    return false;
+  };
 
   return (
-    <nav className="flex flex-col gap-4 lg:gap-6 lg:flex-row lg:items-center">
-      {shoppingViewHeaderMenuItems.map((item) => (
-        <label
-          onClick={()=>handleNavigate(item)}
-          key={item.id}
-          to={item.path}
-          className="font-medium cursor-pointer text-[18px] hover:text-gray-500 transition-colors"
-        >
-          {item.label}
-        </label>
-      ))}
+    <nav className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+      {shoppingViewHeaderMenuItems.map((item) => {
+        const active = isItemActive(item);
+        return (
+          <span
+            key={item.id}
+            onClick={() => handleNavigate(item)}
+            className={`cursor-pointer text-[17px] font-medium transition-colors ${
+              active
+                ? 'text-black font-semibold underline-offset-4'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            {item.label}
+          </span>
+        );
+      })}
     </nav>
   );
 }
 
-function HeaderRightContent({ isMobile = false }) {
+function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = false }) {
   const { user } = useSelector((state) => state.auth);
-  const {cartItems} = useSelector((state)=>state.shopCart);
-  const[openCartSheet,setOpenCartSheet] = useState(false);
+  const { cartItems } = useSelector((state) => state.shopCart);
   const dispatch = useDispatch();
+  const [openCartSheet, setOpenCartSheet] = useState(false);
+
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(fetchCartItems({ userId: user._id }));
+    }
+  }, [dispatch, user?._id]);
+
+  const totalItemCount = cartItems.items?.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
     dispatch(logoutUser())
-      .then((data) => {
-        if (data?.payload?.success) {
-          toast.success(data?.payload?.message);
+      .then((res) => {
+        if (res?.payload?.success) {
+          toast.success(res.payload.message);
         }
       })
-      .catch((err) => {
-        console.log(err?.message);
-      });
+      .catch((err) => console.error(err));
   };
 
-  //fetch cartItems to persist in cart.
-  useEffect(()=>{
-    dispatch(fetchCartItems({userId:user?._id}))
-  },[dispatch])
+  if (isMobileCartOnly) {
+    return (
+      <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative ml-auto lg:hidden">
+            <ShoppingCart className="w-6 h-6 text-gray-700" />
+            {totalItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold shadow-md">
+                {totalItemCount}
+              </span>
+            )}
+          </Button>
+        </SheetTrigger>
+        <UserCartWrapper
+          setOpenCartSheet={setOpenCartSheet}
+          cartItems={cartItems}
+        />
+      </Sheet>
+    );
+  }
 
-  const AccountLinks = (
+  if (!user) {
+    return isMobile ? (
+      <div className="flex flex-col gap-3 border-t pt-4">
+        <Link to="/auth/login" onClick={onNavigate} className="text-sm text-blue-600 font-medium">Login</Link>
+        <Link to="/auth/register" onClick={onNavigate} className="text-sm text-blue-600 font-medium">Register</Link>
+      </div>
+    ) : (
+      <div className="flex items-center gap-4">
+        <Link to="/auth/login" className="text-sm text-blue-600 font-medium hover:underline">Login</Link>
+        <Link to="/auth/register" className="text-sm text-blue-600 font-medium hover:underline">Register</Link>
+      </div>
+    );
+  }
+
+  const accountSection = (
     <>
-      <Link
-        to="/shop/account"
-        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-blue-100 rounded-md"
-      >
+      <Link to="/shop/account" onClick={onNavigate} className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-blue-50 rounded-md">
         <UserCog className="w-4 h-4" />
         Account
       </Link>
@@ -90,45 +166,53 @@ function HeaderRightContent({ isMobile = false }) {
     </>
   );
 
-  if (isMobile) {
-    return (
-      <div className="flex flex-col gap-4 pt-4 border-t">
-        <div className="text-sm font-semibold">Logged in as {user?.userName}</div>
-        {AccountLinks}
-      </div>
-    );
-  }
-
-  return (
+  return isMobile ? (
+    <div className="flex flex-col gap-3 pt-4 border-t">
+      <div className="text-sm font-semibold">Hi, {user?.userName}</div>
+      {accountSection}
+    </div>
+  ) : (
     <div className="flex items-center gap-4">
-     
-     <Sheet open={openCartSheet} onOpenChange={()=>setOpenCartSheet(false)}>
-       <Button onClick={()=>setOpenCartSheet(true)} variant="outline" size="icon" className="cursor-pointer">
-        <ShoppingCart className="w-6 h-6" />
-        <span className="sr-only">User cart</span>
-      </Button>
-      <UserCartWrapper setOpenCartSheet={setOpenCartSheet} cartItems={cartItems}/>
-     </Sheet>
+      <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative">
+            <ShoppingCart className="w-6 h-6 text-gray-700" />
+            {totalItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold shadow-md">
+                {totalItemCount}
+              </span>
+            )}
+          </Button>
+        </SheetTrigger>
+        <UserCartWrapper
+          setOpenCartSheet={setOpenCartSheet}
+          cartItems={cartItems}
+        />
+      </Sheet>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black cursor-pointer">
-            <AvatarFallback className="bg-black text-white font-bold">
+          <Avatar className="cursor-pointer ring-1 ring-gray-300">
+            <AvatarFallback className="bg-gray-800 text-white">
               {user?.userName?.[0]?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-48 mt-2">
-          <DropdownMenuLabel className="text-sm font-medium">
-            Logged in as {user?.userName?.toUpperCase() || 'User'}
+        <DropdownMenuContent className="w-48">
+          <DropdownMenuLabel className="text-sm">
+            Hi, {user?.userName?.toUpperCase()}
           </DropdownMenuLabel>
           <DropdownMenuItem asChild>
-            <Link to="/shop/account" className="flex items-center gap-2">
-              <UserCog className="h-4 w-4" /> Account
+            <Link to="/shop/account" onClick={onNavigate}>
+              <UserCog className="w-4 h-4 mr-2" />
+              Account
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
-            <LogOut className="h-4 w-4" />
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="text-red-600 hover:bg-red-100"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -139,40 +223,42 @@ function HeaderRightContent({ isMobile = false }) {
 
 function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [openMobileSheet, setOpenMobileSheet] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-md">
-      <div className="flex h-17 items-center justify-between px-4 md:px-6">
-        {/* Brand Logo */}
-        <Link to="/shop/home" className="flex items-center gap-2 ">
-          <HousePlug className="h-6 w-6" />
-          <span className="font-bold text-lg">Lav Store</span>
+    <header className="fixed top-0 z-50 w-full border-b bg-white shadow-md">
+      <div className="flex h-16 items-center justify-between px-4 md:px-6">
+        {/* Logo */}
+        <Link to="/shop/home" className="flex items-center gap-2">
+          <HousePlug className="w-6 h-6" />
+          <span className="text-xl font-bold text-gray-800">Lav Store</span>
         </Link>
 
-        {/* Mobile Menu */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs p-4 space-y-6">
-            <MenuItems />
-            {isAuthenticated && <HeaderRightContent isMobile />}
-          </SheetContent>
-        </Sheet>
+        {/* Mobile Cart & Hamburger */}
+        <div className="flex items-center gap-2 lg:hidden">
+          {isAuthenticated && <HeaderRightContent isMobileCartOnly />}
+          <Sheet open={openMobileSheet} onOpenChange={setOpenMobileSheet}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="lg:hidden">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full max-w-xs p-4 space-y-6">
+              <MenuItems onNavigate={() => setOpenMobileSheet(false)} />
+              <HeaderRightContent isMobile onNavigate={() => setOpenMobileSheet(false)} />
+            </SheetContent>
+          </Sheet>
+        </div>
 
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex lg:items-center lg:gap-6">
+        {/* Desktop Nav */}
+        <div className="hidden lg:flex items-center gap-6">
           <MenuItems />
         </div>
 
-        {/* Right Side (Cart + Avatar) */}
-        {isAuthenticated && (
-          <div className="hidden lg:flex items-center">
-            <HeaderRightContent />
-          </div>
-        )}
+        {/* Desktop Right Side */}
+        <div className="hidden lg:flex items-center">
+          <HeaderRightContent />
+        </div>
       </div>
     </header>
   );

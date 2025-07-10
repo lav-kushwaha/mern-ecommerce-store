@@ -46,9 +46,7 @@ const adminOrderSlice = createSlice({
   name: "adminOrderSlice",
   initialState,
   reducers: {
-    resetOrderDetails: (state) => {
-      console.log("resetOrderDetails");
-      
+    resetOrderDetails: (state) => {      
       state.orderDetails = null;
     },
   },

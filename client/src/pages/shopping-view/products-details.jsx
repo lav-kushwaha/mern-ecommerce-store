@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   fetchProductDetails,
   fetchRecommendations,
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const {user} = useSelector((state)=>state.auth)
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const { productDetails, recommendations, isLoadingRecommendations } = useSelector(
@@ -22,16 +22,16 @@ const ProductDetails = () => {
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef(null);
 
-  //add to cart
-  function handleAddtoCart(){
-      dispatch(addToCart({userId:user?._id,productId:id,quantity:1}))
-      .then((data)=>{
-        if(data?.payload?.success){
-          dispatch(fetchCartItems({userId:user?._id}))
-          toast.success(data?.payload?.message);
-        }
-      })
-  }
+  const handleAddtoCart = (productId = id) => {
+    if (productDetails?.totalStock === 0) return;
+
+    dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems({ userId: user?._id }));
+        toast.success(data?.payload?.message);
+      }
+    });
+  };
 
   useEffect(() => {
     dispatch(fetchProductDetails({ id }));
@@ -64,18 +64,24 @@ const ProductDetails = () => {
   };
 
   if (!productDetails) {
-    return <div className="text-center py-20 text-lg font-medium">Loading product...</div>;
+    return (
+      <div className="text-center py-20 text-lg font-medium">
+        Loading product...
+      </div>
+    );
   }
 
-  const { title, description, price, salePrice, brand, category, images } = productDetails;
+  const { title, description, price, salePrice, brand, category, images, totalStock } =
+    productDetails;
+
   const isOnSale = salePrice < price;
+  const isOutOfStock = totalStock === 0;
 
   return (
     <div className="bg-white min-h-screen px-4 md:px-10 py-10">
       <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
-        {/* Left - Image Section */}
+        {/* Left - Images */}
         <div className="w-full lg:w-1/2">
-          {/* Mobile Carousel */}
           <div className="lg:hidden mb-6">
             <div
               ref={carouselRef}
@@ -96,7 +102,6 @@ const ProductDetails = () => {
                 />
               ))}
             </div>
-            {/* Dots */}
             <div className="flex justify-center mt-3 space-x-2">
               {images?.map((_, idx) => (
                 <button
@@ -110,9 +115,8 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Desktop Image Display */}
+          {/* Desktop View */}
           <div className="hidden lg:flex gap-6">
-            {/* Thumbnails */}
             <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto sticky top-20">
               {images?.map((img, idx) => (
                 <img
@@ -120,14 +124,12 @@ const ProductDetails = () => {
                   src={img}
                   alt={`thumb-${idx}`}
                   className={`w-20 h-25 object-cover border rounded cursor-pointer hover:ring-2 hover:ring-black transition ${
-                    selectedImage === idx ? 'ring-2 ring-black' : ''
+                    selectedImage === img ? 'ring-2 ring-black' : ''
                   }`}
                   onClick={() => setSelectedImage(img)}
                 />
               ))}
             </div>
-
-            {/* Main Image */}
             <div className="flex-1 border rounded-lg overflow-hidden shadow sticky top-20">
               <img
                 src={selectedImage}
@@ -152,33 +154,46 @@ const ProductDetails = () => {
               <span className="line-through text-gray-400 text-lg">${price}</span>
             )}
           </div>
+
           {isOnSale && (
-            <p className="text-green-600 text-sm">You save ${price - salePrice}</p>
+            <p className="text-green-600 text-sm">
+              You save ${Math.round(price - salePrice)}
+            </p>
           )}
 
-          <p className="text-gray-700 text-base leading-relaxed border-t pt-4">{description}</p>
+          <p className="text-gray-700 text-base leading-relaxed border-t pt-4">
+            {description}
+          </p>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-            <button onClick={handleAddtoCart} className="w-full cursor-pointer sm:w-auto px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition">
-              Add to Cart
+            <button
+              onClick={() => handleAddtoCart()}
+              disabled={isOutOfStock}
+              className={`w-full sm:w-auto px-6 py-3 rounded font-semibold transition ${
+                isOutOfStock
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'bg-black hover:bg-gray-800 text-white'
+              }`}
+            >
+              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
             </button>
-            {/* <button className="w-full sm:w-auto px-6 py-3 border border-black rounded hover:bg-gray-100 transition">
-              Buy Now
-            </button> */}
           </div>
         </div>
       </div>
 
       {/* Recommendations */}
-      <div className="max-w-screen-xl mx-auto mt-20 ">
+      <div className="max-w-screen-xl mx-auto mt-20">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">You may also like</h2>
         {isLoadingRecommendations ? (
           <p className="text-gray-500">Loading recommendations...</p>
         ) : recommendations?.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {recommendations.slice(0, 8).map((item) => (
-              <Link to={`/shop/product-details/${item._id}`}><ShoppingProductTile key={item._id} product={item} cartBtn={false}/></Link>
+              <ShoppingProductTile
+                key={item._id}
+                product={item}
+                handleAddtoCart={handleAddtoCart}
+              />
             ))}
           </div>
         ) : (

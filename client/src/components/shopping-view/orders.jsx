@@ -81,7 +81,7 @@ const ShoppingOrders = () => {
                   </TableCell>
                   <TableCell
                     className={`capitalize font-medium ${
-                      orderItem.orderStatus === 'pending'
+                     ['pending', 'rejected'].includes( orderItem.orderStatus )
                         ? 'text-red-500'
                         : 'text-green-600'
                     }`}

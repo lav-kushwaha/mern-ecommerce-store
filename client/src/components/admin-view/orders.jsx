@@ -71,7 +71,11 @@ const AdminOrdersView = () => {
                   <TableRow key={orderItem._id}>
                     <TableCell>{orderItem._id}</TableCell>
                     <TableCell>{new Date(orderItem.orderDate).toLocaleDateString()}</TableCell>
-                    <TableCell className={`capitalize font-medium ${orderItem.orderStatus === 'pending' ? 'text-red-500' : 'text-green-600'}`}>
+                    <TableCell className={`capitalize font-medium ${
+                    ['pending', 'rejected'].includes(orderItem.orderStatus)
+                        ? 'text-red-500'
+                        : 'text-green-600'
+              }`}>
                       {orderItem.orderStatus}
                     </TableCell>
                     <TableCell className="font-semibold">${orderItem.totalAmount}</TableCell>
