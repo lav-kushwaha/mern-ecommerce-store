@@ -82,7 +82,6 @@ const ProductFilter = ({ filters, handleFilter, handleClearAll }) => {
               ))}
             </div>
 
-            {/* Apply Button */}
             <div className="p-4 border-t">
               <Button
                 className="w-full"
