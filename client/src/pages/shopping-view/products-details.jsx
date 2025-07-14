@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 const ProductDetails = () => {
   const { id } = useParams();
   const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.shopCart);
   const dispatch = useDispatch();
 
   const { productDetails, recommendations, isLoadingRecommendations } = useSelector(
@@ -22,8 +23,21 @@ const ProductDetails = () => {
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef(null);
 
-  const handleAddtoCart = (productId = id) => {
-    if (productDetails?.totalStock === 0) return;
+  const handleAddtoCart = (productId, getTotalStock) => {
+    if (getTotalStock === 0) return;
+
+    const getCartItems = cartItems?.items || [];
+    const indexOfCurrentItem = getCartItems.findIndex(
+      (item) => item.productId === productId
+    );
+
+    if (indexOfCurrentItem > -1) {
+      const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+      if (getQuantity + 1 > getTotalStock) {
+        toast.warning(`Only ${getTotalStock} items can be added for this product`);
+        return;
+      }
+    }
 
     dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then((data) => {
       if (data?.payload?.success) {
@@ -82,6 +96,7 @@ const ProductDetails = () => {
       <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Left - Images */}
         <div className="w-full lg:w-1/2">
+          {/* Mobile Carousel */}
           <div className="lg:hidden mb-6">
             <div
               ref={carouselRef}
@@ -167,7 +182,7 @@ const ProductDetails = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
             <button
-              onClick={() => handleAddtoCart()}
+              onClick={() => handleAddtoCart(id, totalStock)}
               disabled={isOutOfStock}
               className={`w-full sm:w-auto px-6 py-3 rounded font-semibold transition ${
                 isOutOfStock
