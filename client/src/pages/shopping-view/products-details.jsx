@@ -1,51 +1,29 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import {
   fetchProductDetails,
   fetchRecommendations,
-} from '../../store/shop/products-slice';
-import ShoppingProductTile from '../../components/shopping-view/product-tile';
-import { addToCart, fetchCartItems } from '../../store/shop/cart-slice';
-import { toast } from 'sonner';
+} from "../../store/shop/products-slice";
+import ShoppingProductTile from "../../components/shopping-view/product-tile";
+import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
+import { toast } from "sonner";
+import ReviewsSection from "../../components/shopping-view/ReviewSection";
+import StartRatingComponent from "../../components/common/star-rating";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
+  const { reviews } = useSelector((state) => state.shopReview);
   const dispatch = useDispatch();
 
-  const { productDetails, recommendations, isLoadingRecommendations } = useSelector(
-    (state) => state.shopProducts
-  );
+  const { productDetails, recommendations, isLoadingRecommendations } =
+    useSelector((state) => state.shopProducts);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef(null);
-
-  const handleAddtoCart = (productId, getTotalStock) => {
-    if (getTotalStock === 0) return;
-
-    const getCartItems = cartItems?.items || [];
-    const indexOfCurrentItem = getCartItems.findIndex(
-      (item) => item.productId === productId
-    );
-
-    if (indexOfCurrentItem > -1) {
-      const getQuantity = getCartItems[indexOfCurrentItem].quantity;
-      if (getQuantity + 1 > getTotalStock) {
-        toast.warning(`Only ${getTotalStock} items can be added for this product`);
-        return;
-      }
-    }
-
-    dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchCartItems({ userId: user?._id }));
-        toast.success(data?.payload?.message);
-      }
-    });
-  };
 
   useEffect(() => {
     dispatch(fetchProductDetails({ id }));
@@ -68,18 +46,35 @@ const ProductDetails = () => {
     }
   }, [productDetails, dispatch]);
 
+  const handleAddtoCart = (productId, getTotalStock) => {
+    const currentItem = cartItems?.items?.find((item) => item.productId === productId);
+    const currentQty = currentItem?.quantity || 0;
+
+    if (currentQty + 1 > getTotalStock) {
+      toast.warning(`Only ${getTotalStock} items can be added for this product`);
+      return;
+    }
+
+    dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems({ userId: user?._id }));
+        toast.success(data?.payload?.message);
+      }
+    });
+  };
+
   const scrollToImage = (index) => {
     if (carouselRef.current) {
       carouselRef.current.scrollTo({
         left: index * carouselRef.current.offsetWidth,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     }
   };
 
   if (!productDetails) {
     return (
-      <div className="text-center py-20 text-lg font-medium">
+      <div className="text-center py-20 text-lg font-medium text-gray-800">
         Loading product...
       </div>
     );
@@ -87,16 +82,17 @@ const ProductDetails = () => {
 
   const { title, description, price, salePrice, brand, category, images, totalStock } =
     productDetails;
-
   const isOnSale = salePrice < price;
   const isOutOfStock = totalStock === 0;
+  const averageRating =
+    reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1);
 
   return (
-    <div className="bg-white min-h-screen px-4 md:px-10 py-10">
-      <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
-        {/* Left - Images */}
+    <div className="bg-white text-gray-900 min-h-screen px-4 md:px-10 py-10">
+      <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-10">
+        {/* LEFT: Images */}
         <div className="w-full lg:w-1/2">
-          {/* Mobile Carousel */}
+          {/* Mobile carousel */}
           <div className="lg:hidden mb-6">
             <div
               ref={carouselRef}
@@ -107,39 +103,39 @@ const ProductDetails = () => {
                 setCurrentMobileIndex(Math.round(scrollLeft / width));
               }}
             >
-              {images?.map((img, idx) => (
+              {images.map((img, idx) => (
                 <img
                   key={idx}
                   src={img}
-                  alt={`slide-${idx}`}
+                  alt={`mobile-slide-${idx}`}
                   className="w-full h-80 flex-shrink-0 object-contain border rounded-lg snap-center"
                   onClick={() => setSelectedImage(img)}
                 />
               ))}
             </div>
             <div className="flex justify-center mt-3 space-x-2">
-              {images?.map((_, idx) => (
+              {images.map((_, idx) => (
                 <button
                   key={idx}
-                  className={`w-3 h-3 rounded-full transition ${
-                    idx === currentMobileIndex ? 'bg-black' : 'bg-gray-300'
-                  }`}
                   onClick={() => scrollToImage(idx)}
+                  className={`w-3 h-3 rounded-full transition ${
+                    idx === currentMobileIndex ? "bg-black" : "bg-gray-300"
+                  }`}
                 ></button>
               ))}
             </div>
           </div>
 
-          {/* Desktop View */}
+          {/* Desktop thumbnails + main image */}
           <div className="hidden lg:flex gap-6">
             <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto sticky top-20">
-              {images?.map((img, idx) => (
+              {images.map((img, idx) => (
                 <img
                   key={idx}
                   src={img}
                   alt={`thumb-${idx}`}
-                  className={`w-20 h-25 object-cover border rounded cursor-pointer hover:ring-2 hover:ring-black transition ${
-                    selectedImage === img ? 'ring-2 ring-black' : ''
+                  className={`w-20 h-24 object-cover border rounded cursor-pointer hover:ring-2 hover:ring-black transition ${
+                    selectedImage === img ? "ring-2 ring-black" : ""
                   }`}
                   onClick={() => setSelectedImage(img)}
                 />
@@ -155,10 +151,20 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Right - Product Info */}
+        {/* RIGHT: Product Info */}
         <div className="w-full lg:w-1/2 space-y-6">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">{title}</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl lg:text-4xl font-bold">{title}</h1>
+
+          {reviews.length > 0 && (
+            <div className="flex items-center gap-2">
+              <StartRatingComponent review={{ rating: averageRating }} />
+              <p className="text-sm text-gray-600">
+                ({averageRating.toFixed(1)} out of 5)
+              </p>
+            </div>
+          )}
+
+          <p className="text-gray-700">
             <span className="font-semibold">Brand:</span> {brand} &nbsp;|&nbsp;
             <span className="font-semibold">Category:</span> {category}
           </p>
@@ -176,33 +182,48 @@ const ProductDetails = () => {
             </p>
           )}
 
-          <p className="text-gray-700 text-base leading-relaxed border-t pt-4">
+          <p className="text-base leading-relaxed border-t border-gray-300 pt-4">
             {description}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-            <button
-              onClick={() => handleAddtoCart(id, totalStock)}
-              disabled={isOutOfStock}
-              className={`w-full sm:w-auto px-6 py-3 rounded font-semibold transition ${
-                isOutOfStock
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-black hover:bg-gray-800 text-white'
-              }`}
-            >
-              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+          <div className="pt-6 border-t border-gray-300">
+            {(() => {
+              const cartItem = cartItems?.items?.find((item) => item.productId === id);
+              const quantityInCart = cartItem?.quantity || 0;
+              const maxReached = quantityInCart >= totalStock;
+              const isButtonDisabled = isOutOfStock || maxReached;
+
+              let buttonLabel = "Add to Cart";
+              if (isOutOfStock) buttonLabel = "Out of Stock";
+              else if (maxReached) buttonLabel = "Max Limit Reached";
+
+              return (
+                <button
+                  onClick={() => handleAddtoCart(id, totalStock)}
+                  disabled={isButtonDisabled}
+                  className={`w-full sm:w-auto px-6 py-3 rounded font-semibold transition ${
+                    isButtonDisabled
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-black hover:bg-gray-800 text-white"
+                  }`}
+                >
+                  {buttonLabel}
+                </button>
+              );
+            })()}
           </div>
+
+          <ReviewsSection productId={id} />
         </div>
       </div>
 
       {/* Recommendations */}
       <div className="max-w-screen-xl mx-auto mt-20">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">You may also like</h2>
+        <h2 className="text-2xl font-semibold mb-6">You may also like</h2>
         {isLoadingRecommendations ? (
           <p className="text-gray-500">Loading recommendations...</p>
         ) : recommendations?.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {recommendations.slice(0, 8).map((item) => (
               <ShoppingProductTile
                 key={item._id}
