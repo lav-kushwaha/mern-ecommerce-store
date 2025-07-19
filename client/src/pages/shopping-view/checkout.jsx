@@ -63,9 +63,7 @@ const ShoppingCheckout = () => {
         payerId: "",
       };
  
-      dispatch(createNewOrder(orderData)).then((data)=>{
-          console.log(data, "cretateneworder");
-          
+      dispatch(createNewOrder(orderData)).then((data)=>{          
           if(data?.payload?.success){
             setIsPaymentStart(true);
           }else{
@@ -100,7 +98,11 @@ const ShoppingCheckout = () => {
           </div>
         </div>
         <div className="mt-4 w-full">
-          <Button onClick={handleInitiatePaypalPayment} className="w-full cursor-pointer">Checkout With Paypal</Button>
+          <Button onClick={handleInitiatePaypalPayment} className="w-full cursor-pointer">
+            {
+              isPaymentStart?"Processing Paypal Payment..." : "Checkout With Paypal"
+            }
+            </Button>
         </div>
         </div>
       </div>

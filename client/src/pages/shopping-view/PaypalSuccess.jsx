@@ -15,8 +15,7 @@ const PaypalSuccess = () => {
     if (orderID && orderId) {
       dispatch(captureOrder({ orderID, orderId }))
         .then((action) => {
-          console.log(action, "captureOrder");
-          
+                    
           const status = action.type.endsWith("fulfilled") ? "success" : "failed";
           navigate(`/shop/order-confirmed/${orderId}?status=${status}`);
         })

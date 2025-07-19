@@ -1,31 +1,30 @@
-import React from 'react'
-import { Card, CardContent } from '../ui/card'
-import { Button } from '../ui/button'
-import { Pencil, Trash2, CheckCircle } from 'lucide-react'
+import React from 'react';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Pencil, Trash2, CheckCircle } from 'lucide-react';
 
 const AddressCard = ({
   addressInfo,
   selectedAddressId,
   setCurrentSelectedAddress,
   handleEditAddress,
-  handleDeleteAddress
+  handleDeleteAddress,
 }) => {
-
-  const isSelected = selectedAddressId === addressInfo._id
+  const isSelected = selectedAddressId === addressInfo._id;
 
   return (
     <Card
       onClick={() => setCurrentSelectedAddress?.(addressInfo)}
-      className={`relative group flex flex-col justify-between h-full rounded-lg border transition-all cursor-pointer ${
+      className={`relative group flex flex-col justify-between h-full rounded-xl border cursor-pointer transition-all ${
         isSelected
-          ? 'border-blue-600 ring-2 ring-blue-300/40 shadow-lg bg-blue-50'
-          : 'border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300'
+          ? 'border-blue-600 ring-2 ring-blue-300/40 shadow-md bg-blue-50'
+          : 'border-gray-200 hover:shadow-md hover:border-blue-300'
       }`}
     >
       <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
         {/* Selected Tag */}
         {isSelected && (
-          <div className="absolute top-2 right-2 text-xs font-semibold text-blue-600 flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full">
+          <div className="absolute top-2 right-2 text-xs font-medium text-blue-600 flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full shadow-sm">
             <CheckCircle className="w-4 h-4" />
             Selected
           </div>
@@ -53,13 +52,13 @@ const AddressCard = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 mt-4">
+        <div className="flex flex-wrap justify-end gap-2 pt-4 border-t border-gray-100 mt-4">
           <Button
             size="sm"
             variant="outline"
             onClick={(e) => {
-              e.stopPropagation()
-              handleEditAddress(addressInfo)
+              e.stopPropagation();
+              handleEditAddress(addressInfo);
             }}
             className="flex items-center gap-1 text-sm"
           >
@@ -70,8 +69,8 @@ const AddressCard = ({
             size="sm"
             variant="destructive"
             onClick={(e) => {
-              e.stopPropagation()
-              handleDeleteAddress(addressInfo)
+              e.stopPropagation();
+              handleDeleteAddress(addressInfo);
             }}
             className="flex items-center gap-1 text-sm"
           >
@@ -81,7 +80,7 @@ const AddressCard = ({
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default AddressCard
+export default AddressCard;

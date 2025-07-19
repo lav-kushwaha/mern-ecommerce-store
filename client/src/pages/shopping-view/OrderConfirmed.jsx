@@ -1,10 +1,19 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { fetchCartItems } from "../../store/shop/cart-slice";
 
 const OrderConfirmed = () => {
   const { orderId } = useParams();
   const [params] = useSearchParams();
   const status = params.get("status");
   const isSuccess = status === "success";
+  const dispatch = useDispatch();
+  const {user} = useSelector(state=>state.auth);
+
+  useEffect(()=>{
+   dispatch(fetchCartItems({ userId: user?._id })); //dispatch so, after placing order cart will be clear.
+  },[dispatch])
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">

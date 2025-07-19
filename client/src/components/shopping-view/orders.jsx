@@ -52,7 +52,7 @@ const ShoppingOrders = () => {
   };
 
   return (
-    <Card className="w-full max-w-7xl mx-auto my-4 p-4 sm:p-6 lg:p-8 shadow-md rounded-xl">
+    <Card className="w-full max-w-7xl mx-auto my-4 p-4 sm:p-6 lg:p-8 rounded-xl">
       <CardHeader className="mb-4">
         <CardTitle className="text-xl sm:text-2xl font-semibold text-center sm:text-left">
           Your Orders

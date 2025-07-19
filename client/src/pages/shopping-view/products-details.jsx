@@ -77,13 +77,14 @@ const ProductDetails = () => {
       <div className="text-center py-20 text-lg font-medium text-gray-800">
         Loading product...
       </div>
-    );
+    ); 
   }
 
   const { title, description, price, salePrice, brand, category, images, totalStock } =
     productDetails;
   const isOnSale = salePrice < price;
   const isOutOfStock = totalStock === 0;
+  
   const averageRating =
     reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1);
 
@@ -141,7 +142,7 @@ const ProductDetails = () => {
                 />
               ))}
             </div>
-            <div className="flex-1 border rounded-lg overflow-hidden shadow sticky top-20">
+            <div className="flex-1 border rounded-lg overflow-hidden sticky top-20">
               <img
                 src={selectedImage}
                 alt="Main"

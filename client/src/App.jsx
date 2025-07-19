@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import AuthLayout from "./components/auth/layout"
 import AuthLogin from "./pages/auth/login"
 import AuthRegister from "./pages/auth/register"
@@ -21,6 +21,8 @@ import { checkAuth } from "./store/auth-slice"
 import ProductsDetails from "./pages/shopping-view/products-details"
 import PaypalSuccess from "./pages/shopping-view/PaypalSuccess"
 import OrderConfirmed from "./pages/shopping-view/OrderConfirmed"
+import SearchProducts from "./pages/shopping-view/search"
+import ScrollToTop from "./components/common/scrollToTop"
 
 
 function App() {
@@ -36,8 +38,17 @@ function App() {
 
   return (
     <div className="flex flex-col overflow-hidden bg-black">
+         <ScrollToTop/>
         <Routes>
-
+       <Route
+          path="/"
+          element={
+            <CheckAuth
+              isAuthenticated={isAuthenticated}
+              user={user}
+            ></CheckAuth>
+          }
+        />
             {/* auth components */}
            <Route path="/auth" element={
               <CheckAuth isAuthenticated={isAuthenticated} user={user}>
@@ -67,7 +78,8 @@ function App() {
              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
                <ShoppingLayout/>
              </CheckAuth>
-           }>
+           }>  
+              <Route index element={<Navigate to="listing" replace />} />
               <Route path="home" element={<ShoppingHome/>}/>
               <Route path="listing" element={<ShoppingListing/>}/>
               <Route path="checkout" element={<ShoppingCheckout/>}/>
@@ -75,10 +87,12 @@ function App() {
               <Route path="product-details/:id" element={<ProductsDetails/>}/>
               <Route path="paypal-success" element={<PaypalSuccess />} />
               <Route path="order-confirmed/:orderId" element={<OrderConfirmed/>} />
+               <Route path="search" element={<SearchProducts/>} />
            </Route>
            
-           <Route path="*" element={<NotFound/>}/>
-           <Route path="/unauth-page" element={<UnauthPage/>}/>
+           {/* Unauthenticated page and 404 fallback */}
+          <Route path="/unauth-page" element={<UnauthPage />} />
+          <Route path="*" element={<NotFound />} />
 
         </Routes>
     </div>

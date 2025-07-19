@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { FileIcon, UploadCloudIcon, XIcon } from 'lucide-react';
-import { Button } from '../ui/button';
-import axios from 'axios';
+import React, { useRef, useState } from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import axios from "axios";
 
 const MAX_FILES = 5;
 
 const ProductImageUpload = ({
   uploadedImageUrls = [],
   setUploadedImageUrls,
-  isEditMode = false
+  isEditMode = false,
 }) => {
   const inputRef = useRef(null);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -26,9 +26,7 @@ const ProductImageUpload = ({
     if (droppedFiles.length) uploadMultipleImages(droppedFiles);
   };
 
-  const handleDragOver = (event) => {
-    event.preventDefault();
-  };
+  const handleDragOver = (event) => event.preventDefault();
 
   const handleRemoveImage = (urlToRemove) => {
     setUploadedImageUrls((prev) => prev.filter((url) => url !== urlToRemove));
@@ -42,12 +40,12 @@ const ProductImageUpload = ({
     }
 
     const formData = new FormData();
-    files.forEach((file) => formData.append('my_file', file)); // 💡 Matches backend field name
+    files.forEach((file) => formData.append("my_file", file));
     setUploadingFiles(files.map((f) => f.name));
 
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/admin/products/upload-images',
+        "http://localhost:5000/api/admin/products/upload-images",
         formData
       );
 
@@ -55,23 +53,28 @@ const ProductImageUpload = ({
         setUploadedImageUrls((prev) => [...prev, ...res.data.data]);
       }
     } catch (error) {
-      console.error('Upload failed', error);
-      alert('Image upload failed');
+      console.error("Upload failed", error);
+      alert("Image upload failed");
     } finally {
       setUploadingFiles([]);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto mt-4">
-      <Label className="text-lg font-semibold mb-2 block">Upload Images</Label>
+    <div className="w-full">
+      <Label className="text-lg font-semibold mb-3 block">Upload Images</Label>
 
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         className={`${
-          isEditMode ? 'opacity-60' : ''
-        } border-2 border-dashed rounded-lg p-4`}
+          isEditMode ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+        } border-2 border-dashed border-gray-300 rounded-lg p-6 text-center flex flex-col items-center justify-center transition hover:border-primary`}
+        onClick={() => {
+          if (!isEditMode && uploadedImageUrls.length < MAX_FILES) {
+            inputRef.current?.click();
+          }
+        }}
       >
         <Input
           id="image-upload"
@@ -83,44 +86,34 @@ const ProductImageUpload = ({
           disabled={isEditMode || uploadedImageUrls.length >= MAX_FILES}
         />
 
-        <Label
-          htmlFor="image-upload"
-          className={`${
-            isEditMode || uploadedImageUrls.length >= MAX_FILES
-              ? 'cursor-not-allowed'
-              : 'cursor-pointer'
-          } flex flex-col items-center justify-center h-32`}
-        >
-          <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
-          <span>
-            Drag & Drop or Click to Upload (Max {MAX_FILES} images)
-          </span>
-        </Label>
+        <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
+        <span className="text-sm text-muted-foreground">
+          Drag & Drop or Click to Upload (Max {MAX_FILES} images)
+        </span>
       </div>
 
       {/* Uploading status */}
       <div className="mt-2 text-sm text-muted-foreground">
-        {uploadingFiles.length > 0 &&
-          uploadingFiles.map((fileName, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <FileIcon className="w-4 h-4" />
-              Uploading: {fileName}
-            </div>
-          ))}
+        {uploadingFiles.map((fileName, idx) => (
+          <div key={idx} className="flex items-center gap-2 mt-1">
+            <FileIcon className="w-4 h-4" />
+            Uploading: {fileName}
+          </div>
+        ))}
       </div>
 
       {/* Preview images */}
       {uploadedImageUrls.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-4">
+        <div className="flex flex-col gap-4 mt-6">
           {uploadedImageUrls.map((url, idx) => (
             <div
               key={idx}
-              className="relative group border rounded overflow-hidden"
+              className="relative w-full overflow-hidden rounded-lg shadow border"
             >
               <img
                 src={url}
                 alt={`uploaded-${idx}`}
-                className="w-full h-24 object-cover"
+                className="w-full aspect-[3/1] object-cover"
               />
               {!isEditMode && (
                 <Button
@@ -128,9 +121,9 @@ const ProductImageUpload = ({
                   size="icon"
                   variant="ghost"
                   onClick={() => handleRemoveImage(url)}
-                  className="absolute top-1 right-1 bg-white rounded-full p-1 text-red-500"
+                  className="absolute top-2 right-2 bg-white rounded-full text-red-500"
                 >
-                  <XIcon className="w-4 h-4" />
+                  <XIcon className="w-5 h-5" />
                 </Button>
               )}
             </div>

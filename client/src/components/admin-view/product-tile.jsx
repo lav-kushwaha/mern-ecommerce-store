@@ -9,13 +9,12 @@ function AdminProductTile({
   handleDelete,
 }) {
 
-  console.log(product)
   return (
     <Card className="w-full max-w-xs mx-auto rounded-xl overflow-hidden shadow-sm border bg-white">
-      {/* Image (fixed height + containment) */}
+      {/* Image */}
     <div className="w-full h-72 bg-muted/10 flex items-center justify-center">
       <img
-        src={product?.images?.[0] || "/fallback.jpg"} // Add fallback to avoid broken image
+        src={product?.images?.[0] || "/fallback.jpg"} 
         alt={product?.title}
         className="w-full h-full object-contain"
       />

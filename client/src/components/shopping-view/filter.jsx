@@ -95,7 +95,7 @@ const ProductFilter = ({ filters, handleFilter, handleClearAll }) => {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block bg-white rounded-lg shadow border p-6 w-full max-w-xs sticky top-4 h-fit">
+      <aside className="hidden md:block bg-white rounded-lg border p-6 w-full max-w-xs sticky top-4 h-fit">
         <div className="flex justify-between items-center mb-6 border-b pb-2">
           <h2 className="text-2xl font-bold text-gray-800">Filters</h2>
           <Button

@@ -10,7 +10,7 @@ const ShoppingAccount = () => {
   return (
     <div className="flex flex-col min-h-screen items-center bg-gray-50">
       {/* Full-Width Banner */}
-      <div className="relative w-full h-[300px] overflow-hidden shadow-md">
+      <div className="relative w-full h-[300px] overflow-hidden">
         <img 
           src={accImg} 
           alt="Account Banner" 
@@ -20,7 +20,7 @@ const ShoppingAccount = () => {
 
       {/* Full-Width Main Section */}
       <div className="w-full px-4 sm:px-6 lg:px-12 py-10">
-        <div className="w-full bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="w-full bg-white rounded-xl p-6 border border-gray-200">
           <Tabs defaultValue="orders">
             {/* Tab Buttons */}
             <TabsList className="flex justify-start mb-6 space-x-4">

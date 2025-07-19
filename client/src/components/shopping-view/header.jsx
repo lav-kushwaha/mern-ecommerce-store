@@ -37,7 +37,7 @@ function MenuItems({ onNavigate }) {
   const handleNavigate = (item) => {
     sessionStorage.removeItem('filters');
     const filter =
-      item.id !== 'home' && item.id !== 'products'
+      item.id !== 'home' && item.id !== 'products' && item.id !== 'search'
         ? { category: [item.id] }
         : null;
 
@@ -119,7 +119,7 @@ function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = f
     return (
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative ml-auto lg:hidden">
+          <Button variant="ghost" size="icon" className="relative ml-auto lg:hidden border">
             <ShoppingCart className="w-6 h-6 text-gray-700" />
             {totalItemCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold shadow-md">
@@ -175,7 +175,7 @@ function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = f
     <div className="flex items-center gap-4">
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative border">
             <ShoppingCart className="w-6 h-6 text-gray-700" />
             {totalItemCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold shadow-md">
@@ -226,17 +226,30 @@ function ShoppingHeader() {
   const [openMobileSheet, setOpenMobileSheet] = useState(false);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-white shadow-md">
-      <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo */}
+    <header className="fixed top-0 z-50 w-full border-b bg-white">
+      <div className="flex items-center justify-between h-16 px-4 md:px-6">
+        
+        {/* Left: Logo */}
         <Link to="/shop/home" className="flex items-center gap-2">
           <HousePlug className="w-6 h-6" />
           <span className="text-xl font-bold text-gray-800">Lav Store</span>
         </Link>
 
-        {/* Mobile Cart & Hamburger */}
+        {/* Center: Desktop Nav */}
+        <div className="hidden lg:flex flex-1 justify-center">
+          <MenuItems />
+        </div>
+
+        {/* Right: Desktop actions */}
+        <div className="hidden lg:flex items-center gap-4">
+          <HeaderRightContent />
+        </div>
+
+        {/* Right: Mobile actions (Cart + Hamburger) */}
         <div className="flex items-center gap-2 lg:hidden">
           {isAuthenticated && <HeaderRightContent isMobileCartOnly />}
+
+          {/* Hamburger menu only on mobile */}
           <Sheet open={openMobileSheet} onOpenChange={setOpenMobileSheet}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="lg:hidden">
@@ -249,19 +262,10 @@ function ShoppingHeader() {
             </SheetContent>
           </Sheet>
         </div>
-
-        {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-6">
-          <MenuItems />
-        </div>
-
-        {/* Desktop Right Side */}
-        <div className="hidden lg:flex items-center">
-          <HeaderRightContent />
-        </div>
       </div>
     </header>
   );
 }
+
 
 export default ShoppingHeader;

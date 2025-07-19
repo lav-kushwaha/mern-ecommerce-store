@@ -33,7 +33,8 @@ const ProductSchema = new mongoose.Schema({
   totalStock: { 
     type: Number, 
     required: true 
-  }
+  },
+  averageReview: Number,
 }, { timestamps: true });
 
 module.exports = mongoose.models.Product || mongoose.model('Product', ProductSchema);
