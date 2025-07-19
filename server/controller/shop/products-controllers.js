@@ -1,60 +1,44 @@
 const Product = require("../../models/Product");
 
-//product filter
+//product filter and pagination
 const getFilteredProducts = async (req, res) => {
   try {
+    const { category, brand, sortBy, page = 1, limit = 8 } = req.query;
 
-    const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;  // fallback default which is undefined, category === [] brand === [] if query is empty.
+    const filters = {};
+    if (category) filters.category = { $in: Array.isArray(category) ? category : [category] };
+    if (brand) filters.brand = { $in: Array.isArray(brand) ? brand : [brand] };
 
-    let filters = {}; //If filters is empty, returns all products sorted accordingly.
-    
-    if (category.length) {
-      filters.category = { $in: category.split(",") };
-    }
+    const sortOptions = {
+      "price-lowtohigh": { price: 1 },
+      "price-hightolow": { price: -1 },
+      "newest": { createdAt: -1 },
+      "top-rated":{averageReview:-1},
+      "title-atoz":{title:1},
+      "title-ztoa":{title:-1},
+    };
 
-    if (brand.length) {
-      filters.brand = { $in: brand.split(",") };
-    }
+    const sort = sortOptions[sortBy] || { price : 1};
 
-    let sort = {};
+    const currentPage = Math.max(parseInt(page) || 1, 1);
+    const skip = (currentPage - 1) * parseInt(limit);
 
-    switch (sortBy) {
-      case "price-lowtohigh":
-        sort.price = 1;
+    const total = await Product.countDocuments(filters);
+    const products = await Product.find(filters)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
 
-        break;
-      case "price-hightolow":
-        sort.price = -1;
-
-        break;
-      case "title-atoz":
-        sort.title = 1;
-
-        break;
-
-      case "title-ztoa":
-        sort.title = -1;
-
-        break;
-
-      default:
-        sort.price = 1;
-        break;
-    }    
-   
-    const products = await Product.find(filters).sort(sort);
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: products,
+      total,
+      page: currentPage,
+      totalPages: Math.ceil(total / parseInt(limit)),
     });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Some error occured",
-    });
+  } catch (err) {
+    console.error("Product fetch error:", err);
+    return res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
