@@ -5,40 +5,60 @@ const initialState = {
   isLoading: false,
   productList: [],
   productDetails: null,
-  recommendations: [], 
+  recommendations: [],
+  page: 1,
+  totalPages: 1,
+  totalItems: 0,
 };
 
-
-
+// Fetch all filtered products (pagination, filters, sorting)
 export const fetchAllFilteredProducts = createAsyncThunk(
   "/products/fetchAllProducts",
-  async ({ filterParams, sortParams }) => {
+  async ({ filterParams, sortParams, page = 1 }, thunkAPI) => {
+    try {
+      const query = new URLSearchParams({
+        sortBy: sortParams,
+        page,
+        limit: 8,
+      });
 
-    const query = new URLSearchParams({ 
-      ...filterParams,
-      sortBy: sortParams,
-    });
+      // Handle array-based filters like category[] or brand[]
+      Object.entries(filterParams).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => query.append(key, v));
+        } else {
+          query.append(key, value);
+        }
+      });
 
-    // console.log(query);  //Output: ex - category=men%2Cwomen&brand=nike&sortBy=price-lowtohigh
-    
-    const result = await axios.get(
-      `http://localhost:5000/api/shop/products/get?${query}`
-    );    
+      const result = await axios.get(
+        `http://localhost:5000/api/shop/products/get?${query}`
+      );
 
-    return result?.data;
+      return result.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data || "Error fetching products"
+      );
+    }
   }
 );
 
-//Product details
-export const fetchProductDetails = createAsyncThunk("/shop/productDetails",
-  async({id})=>{
-    const result = await axios.get(`http://localhost:5000/api/shop/products/get/${id}`,{
-      withCredentials:true,
-    })
+// Fetch product details by ID
+export const fetchProductDetails = createAsyncThunk(
+  "/shop/productDetails",
+  async ({ id }) => {
+    const result = await axios.get(
+      `http://localhost:5000/api/shop/products/get/${id}`,
+      {
+        withCredentials: true,
+      }
+    );
     return result.data;
   }
-)
+);
 
+// Fetch recommendations (same category, excluding current product)
 export const fetchRecommendations = createAsyncThunk(
   "/shop/fetchRecommendations",
   async ({ category, excludeId }, thunkAPI) => {
@@ -50,55 +70,65 @@ export const fetchRecommendations = createAsyncThunk(
       const filtered = all.filter((p) => p._id !== excludeId);
       return filtered;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || "Failed to fetch recommendations");
+      return thunkAPI.rejectWithValue(
+        err.response?.data || "Failed to fetch recommendations"
+      );
     }
   }
 );
 
-
+// Slice
 const shoppingProductSlice = createSlice({
   name: "shoppingProducts",
   initialState,
   reducers: {
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
     setProductDetails: (state) => {
       state.productDetails = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllFilteredProducts.pending, (state, action) => {
+      // All products (filtered)
+      .addCase(fetchAllFilteredProducts.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(fetchAllFilteredProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.productList = action.payload.data;
+        state.totalItems = action.payload.total;
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
       })
-      .addCase(fetchAllFilteredProducts.rejected, (state, action) => {
+      .addCase(fetchAllFilteredProducts.rejected, (state) => {
         state.isLoading = false;
         state.productList = [];
       })
 
-      .addCase(fetchProductDetails.pending, (state, action) => {
+      // Product details
+      .addCase(fetchProductDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
         state.isLoading = false;
         state.productDetails = action?.payload?.data;
       })
-      .addCase(fetchProductDetails.rejected, (state, action) => {
+      .addCase(fetchProductDetails.rejected, (state) => {
         state.isLoading = false;
         state.productDetails = null;
       })
 
+      // Recommendations
       .addCase(fetchRecommendations.fulfilled, (state, action) => {
         state.recommendations = action.payload;
       })
       .addCase(fetchRecommendations.rejected, (state) => {
         state.recommendations = [];
       });
-      
   },
 });
 
-
+export const { setPage, setProductDetails } = shoppingProductSlice.actions;
 export default shoppingProductSlice.reducer;
