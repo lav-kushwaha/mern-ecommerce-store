@@ -102,18 +102,18 @@ const ProductImageUpload = ({
         ))}
       </div>
 
-      {/* Preview images */}
+      {/* Preview thumbnails */}
       {uploadedImageUrls.length > 0 && (
-        <div className="flex flex-col gap-4 mt-6">
+        <div className="mt-4 flex justify-start gap-3 flex-wrap">
           {uploadedImageUrls.map((url, idx) => (
             <div
               key={idx}
-              className="relative w-full overflow-hidden rounded-lg shadow border"
+              className="relative w-[70px] h-[70px] border rounded overflow-hidden"
             >
               <img
                 src={url}
                 alt={`uploaded-${idx}`}
-                className="w-full aspect-[3/1] object-cover"
+                className="w-full h-full object-cover"
               />
               {!isEditMode && (
                 <Button
@@ -121,9 +121,9 @@ const ProductImageUpload = ({
                   size="icon"
                   variant="ghost"
                   onClick={() => handleRemoveImage(url)}
-                  className="absolute top-2 right-2 bg-white rounded-full text-red-500"
+                  className="absolute top-1 right-1 bg-white rounded-full text-red-500 p-0 h-5 w-5"
                 >
-                  <XIcon className="w-5 h-5" />
+                  <XIcon className="w-3 h-3" />
                 </Button>
               )}
             </div>
