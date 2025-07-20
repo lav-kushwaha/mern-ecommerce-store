@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
-import { ArrowUpDownIcon } from "lucide-react";
+import { ArrowUpDownIcon, Loader2 } from "lucide-react";
 import { useSearchParams, useNavigate, createSearchParams } from "react-router-dom";
 import { sortOptions } from "../../config";
 import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
@@ -31,7 +31,6 @@ const ShoppingListing = () => {
   const [sortBy, setSortBy] = useState("price-lowtohigh");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Load from URL or session storage
   useEffect(() => {
     const categoryParam = searchParams.getAll("category");
     const brandParam = searchParams.getAll("brand");
@@ -50,7 +49,6 @@ const ShoppingListing = () => {
     setSortBy(sortParam);
   }, [searchParams]);
 
-  // Fetch products on change
   useEffect(() => {
     dispatch(fetchAllFilteredProducts({
       filterParams: filters,
@@ -60,7 +58,11 @@ const ShoppingListing = () => {
     dispatch(setPage(currentPage));
   }, [dispatch, filters, sortBy, currentPage]);
 
-  // Handle filter
+  // Scroll to top on page or data change
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [currentPage, productList]);
+
   const handleFilter = (section, option) => {
     const selected = filters[section] || [];
     const updatedSection = selected.includes(option)
@@ -86,7 +88,6 @@ const ShoppingListing = () => {
     });
   };
 
-  // Clear all filters
   const handleClearAll = () => {
     setFilters({ category: [], brand: [] });
     sessionStorage.removeItem("filters");
@@ -96,7 +97,6 @@ const ShoppingListing = () => {
     });
   };
 
-  // Pagination
   const handlePageChange = (pageNum) => {
     const query = {
       ...filters,
@@ -109,7 +109,6 @@ const ShoppingListing = () => {
     });
   };
 
-  // Add to cart
   const handleAddtoCart = (productId, totalStock) => {
     const existingItem = cartItems?.items?.find(item => item.productId === productId);
     const currentQty = existingItem?.quantity || 0;
@@ -134,7 +133,11 @@ const ShoppingListing = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 p-4 md:p-6">
-      <ProductFilter filters={filters} handleFilter={handleFilter} handleClearAll={handleClearAll} />
+      <ProductFilter
+        filters={filters}
+        handleFilter={handleFilter}
+        handleClearAll={handleClearAll}
+      />
 
       <div className="bg-white w-full rounded-xl">
         {/* Header */}
@@ -175,10 +178,13 @@ const ShoppingListing = () => {
           </div>
         </div>
 
-        {/* Products */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 p-4">
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 p-4 min-h-[200px]">
           {isLoading ? (
-            <p className="text-center col-span-full py-8">Loading...</p>
+            <div className="col-span-full flex justify-center items-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-muted-foreground">Loading products...</span>
+            </div>
           ) : productList.length > 0 ? (
             productList.map((product) => (
               <ShoppingProductTile
@@ -207,7 +213,8 @@ const ShoppingListing = () => {
               Previous
             </Button>
             <div className="text-center text-muted-foreground text-sm">
-              Page <span className="font-medium">{page}</span> of <span className="font-medium">{totalPages}</span>
+              Page <span className="font-medium">{page}</span> of{" "}
+              <span className="font-medium">{totalPages}</span>
             </div>
             <Button
               variant="outline"
