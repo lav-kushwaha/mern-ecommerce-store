@@ -34,23 +34,24 @@ function MenuItems({ onNavigate }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleNavigate = (item) => {
-    sessionStorage.removeItem('filters');
-    const filter =
-      item.id !== 'home' && item.id !== 'products' && item.id !== 'search'
-        ? { category: [item.id] }
-        : null;
+const handleNavigate = (item) => {
+  const isFilterCategory =
+    item.id !== "home" && item.id !== "products" && item.id !== "search";
 
-    sessionStorage.setItem('filters', JSON.stringify(filter));
+  if (item.path === "/shop/listing" && isFilterCategory) {
+    // Navigate with category filter and reset page
+    const params = new URLSearchParams();
+    params.set("category", item.id);
+    params.set("page", "1");
 
-    if (location.pathname.includes('listing') && filter !== null) {
-      setSearchParams(new URLSearchParams(`?category=${item.id}`));
-    } else {
-      navigate(item.path);
-    }
+    navigate(`${item.path}?${params.toString()}`);
+  } else {
+    // Just navigate to static path (home, all products, search)
+    navigate(item.path);
+  }
 
-    onNavigate?.();
-  };
+  onNavigate?.();
+};
 
   const isItemActive = (item) => {
     if (item.id === 'home') return location.pathname === '/shop/home';
