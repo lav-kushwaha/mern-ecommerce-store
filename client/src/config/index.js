@@ -180,6 +180,8 @@ export const filterOptions = {
 };
 
 export const sortOptions = [
+  { id: "newest", label: "Newest" },
+  { id: "top-rated", label: "Top Rated" },
   { id: "price-lowtohigh", label: "Price: Low to High" },
   { id: "price-hightolow", label: "Price: High to Low" },
   { id: "title-atoz", label: "Title: A to Z" },
