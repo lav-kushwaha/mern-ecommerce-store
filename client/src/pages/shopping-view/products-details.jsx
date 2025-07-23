@@ -77,14 +77,15 @@ const ProductDetails = () => {
       <div className="text-center py-20 text-lg font-medium text-gray-800">
         Loading product...
       </div>
-    ); 
+    );
   }
 
   const { title, description, price, salePrice, brand, category, images, totalStock } =
     productDetails;
-  const isOnSale = salePrice < price;
+
+  const isOnSale = salePrice > 0 && salePrice < price;
   const isOutOfStock = totalStock === 0;
-  
+
   const averageRating =
     reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1);
 
@@ -170,10 +171,21 @@ const ProductDetails = () => {
             <span className="font-semibold">Category:</span> {category}
           </p>
 
+          {/* Pricing */}
           <div className="flex items-center gap-4">
-            <span className="text-2xl font-bold text-green-600">${salePrice}</span>
-            {isOnSale && (
-              <span className="line-through text-gray-400 text-lg">${price}</span>
+            {isOnSale ? (
+              <>
+                <span className="text-2xl font-bold text-green-600">
+                  ${salePrice.toFixed(2)}
+                </span>
+                <span className="line-through text-gray-400 text-lg">
+                  ${price.toFixed(2)}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-bold text-gray-800">
+                ${price.toFixed(2)}
+              </span>
             )}
           </div>
 
