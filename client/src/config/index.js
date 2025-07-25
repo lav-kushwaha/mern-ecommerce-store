@@ -160,6 +160,7 @@ export const brandOptionsMap = {
   levi: "Levi",
   zara: "Zara",
   "h&m": "H&M",
+  accessories: "accessories",
 };
 
 export const filterOptions = {
