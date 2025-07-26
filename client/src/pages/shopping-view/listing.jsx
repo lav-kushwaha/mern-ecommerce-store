@@ -14,16 +14,17 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
-import { ArrowUpDownIcon, Loader2 } from "lucide-react";
+import { ArrowUpDownIcon } from "lucide-react";
 import { useSearchParams, useNavigate, createSearchParams } from "react-router-dom";
 import { sortOptions } from "../../config";
 import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
 import { toast } from 'sonner';
+import ProductSkeleton from "../../components/common/product-skeleton";
 
 const ShoppingListing = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { productList, isLoading, page, totalPages, totalItems } = useSelector((state) => state.shopProducts);
+  const { productList, isLoading, page, totalPages } = useSelector((state) => state.shopProducts);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
@@ -58,7 +59,6 @@ const ShoppingListing = () => {
     dispatch(setPage(currentPage));
   }, [dispatch, filters, sortBy, currentPage]);
 
-  // Scroll to top on page or data change
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [currentPage, productList]);
@@ -181,10 +181,9 @@ const ShoppingListing = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 p-4 min-h-[200px]">
           {isLoading ? (
-            <div className="col-span-full flex justify-center items-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-muted-foreground">Loading products...</span>
-            </div>
+            Array.from({ length: 8 }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
           ) : productList.length > 0 ? (
             productList.map((product) => (
               <ShoppingProductTile
