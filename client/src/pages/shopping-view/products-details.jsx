@@ -10,6 +10,7 @@ import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
 import { toast } from "sonner";
 import ReviewsSection from "../../components/shopping-view/ReviewSection";
 import StartRatingComponent from "../../components/common/star-rating";
+import { getReviews } from "../../store/review-slice";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -28,6 +29,13 @@ const ProductDetails = () => {
   useEffect(() => {
     dispatch(fetchProductDetails({ id }));
   }, [dispatch, id]);
+
+  useEffect(() => {
+  if (id) {
+    dispatch(getReviews({ productId: id }));
+  }
+  }, [dispatch, id]);
+
 
   useEffect(() => {
     if (productDetails?.images?.length > 0) {
