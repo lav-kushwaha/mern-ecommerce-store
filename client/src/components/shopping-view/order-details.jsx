@@ -2,7 +2,7 @@ import React from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
-import OrderDetailsPDF from './orderDetailsPDF';
+import OrderDetailsPDF from './OrderDetailsPDF';
 
 const ShoppingOrderDetailsView = ({ order }) => {
   if (!order) {
