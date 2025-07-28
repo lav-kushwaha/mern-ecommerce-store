@@ -37,9 +37,15 @@ const registerUser = async (req, res) => {
             expiresIn: '2d',
         });
 
-        res.cookie('token', token, {
+        // res.cookie('token', token, {
+        //     httpOnly: true,
+        //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+        // });
+
+          res.cookie('token', token, {
             httpOnly: true,
             maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+            secure:true
         });
 
         res.status(201).json({
