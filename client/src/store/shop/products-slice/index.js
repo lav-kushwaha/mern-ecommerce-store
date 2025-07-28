@@ -32,7 +32,7 @@ export const fetchAllFilteredProducts = createAsyncThunk(
       });
 
       const result = await axios.get(
-        `http://localhost:5000/api/shop/products/get?${query}`
+        `${import.meta.env.VITE_API_URL}/api/shop/products/get?${query}`
       );
 
       return result.data;
@@ -49,7 +49,7 @@ export const fetchProductDetails = createAsyncThunk(
   "/shop/productDetails",
   async ({ id }) => {
     const result = await axios.get(
-      `http://localhost:5000/api/shop/products/get/${id}`,
+      `${import.meta.env.VITE_API_URL}/api/shop/products/get/${id}`,
       {
         withCredentials: true,
       }
@@ -64,7 +64,7 @@ export const fetchRecommendations = createAsyncThunk(
   async ({ category, excludeId }, thunkAPI) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/shop/products/get?category=${category}`
+        `${import.meta.env.VITE_API_URL}/api/shop/products/get?category=${category}`
       );
       const all = response.data?.data || [];
       const filtered = all.filter((p) => p._id !== excludeId);

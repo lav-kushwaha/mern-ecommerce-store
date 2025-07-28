@@ -54,8 +54,8 @@ const createOrder = async (req, res) => {
 
     // Step 2: Create PayPal order
     const paypalOrder = await paypal.createPaypalOrder(totalAmount, {
-      return_url: `http://localhost:5173/shop/paypal-success?orderId=${newlyCreatedOrder._id}`,
-      cancel_url: "http://localhost:5173/shop/checkout",
+      return_url: `${process.env.CLIENT_BASE_URL}/shop/paypal-success?orderId=${newlyCreatedOrder._id}`,
+      cancel_url: `${process.env.CLIENT_BASE_URL}/shop/checkout`,
     });
 
     // Step 3: Save PayPal payment ID

@@ -13,7 +13,7 @@ export const createNewOrder = createAsyncThunk(
   "order/createNewOrder",
   async (orderData, { rejectWithValue }) => {    
     try {
-      const res = await axios.post("http://localhost:5000/api/shop/order/create", orderData);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/shop/order/create`, orderData);
       return res.data;
     } catch (err) {
       const message = err?.response?.data?.message || err.message;
@@ -26,7 +26,7 @@ export const captureOrder = createAsyncThunk(
   'order/captureOrder',
   async ({ orderID, orderId }, thunkAPI) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/shop/order/capture', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/shop/order/capture`, {
         orderID,
         orderId,
       });
@@ -42,7 +42,7 @@ export const getAllOrdersByUserId = createAsyncThunk(
   'order/getAllOrdersByUserId',
   async (userId, thunkAPI) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/shop/order/list/${userId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/shop/order/list/${userId}`);
       return response.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unknown error");
@@ -54,7 +54,7 @@ export const getOrderDetails = createAsyncThunk(
   'order/getOrderDetails',
   async (id, thunkAPI) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/shop/order/details/${id}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/shop/order/details/${id}`);
       return response.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unknown error");
@@ -79,10 +79,6 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = false;
         state.orderId = action?.payload?.orderId;
         state.approvalURL = action.payload.approvalURL;
-        // sessionStorage.setItem(
-        //   "currentOrderId",
-        //   JSON.stringify(action?.payload?.orderId)
-        // );
       })
       .addCase(createNewOrder.rejected, (state, action) => {
         state.isLoading = false;
