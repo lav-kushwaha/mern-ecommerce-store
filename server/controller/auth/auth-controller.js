@@ -1,70 +1,94 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 const User = require('../../models/User');
 
 // Register
 const registerUser = async (req, res) => {
-    const { userName, email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      success: false,
+      errors: errors.array()
+  
+    });
+  }
 
-    try {
-        if (!userName || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Please enter all required fields.",
-            });
-        }
+  const { userName, email, password } = req.body;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message: "User already exists.",
-            });
-        }
-
-        const hashPassword = await bcrypt.hash(password, 12);
-
-        const newUser = new User({
-            userName,
-            email,
-            password: hashPassword,
-        });
-
-        await newUser.save();
-
-        const token = jwt.sign({ _id: newUser._id }, process.env.JWTSECRET, {
-            expiresIn: '2d',
-        });
-
-        // res.cookie('token', token, {
-        //     httpOnly: true,
-        //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-        // });
-
-        //   res.cookie('token', token, {
-        //     httpOnly: true,
-        //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-        //     secure:true
-        // });
-
-
-        res.status(201).json({
-            success: true,
-            message: "Registration successful.",
-        });
-
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({
-            success: false,
-            message: "Server error.",
-        });
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already registered.",
+      });
     }
+
+    const existingUsername = await User.findOne({ userName });
+    if (existingUsername) {
+      return res.status(409).json({
+        success: false,
+        message: "Username already taken.",
+      });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 12);
+
+    const newUser = new User({
+      userName,
+      email,
+      password: hashPassword,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ _id: newUser._id }, process.env.JWTSECRET, {
+      expiresIn: '2d',
+    });
+
+    // res.cookie('token', token, {
+    //     httpOnly: true,
+    //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    // });
+
+    // res.cookie('token', token, {
+    //     httpOnly: true,
+    //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    //     secure: true
+    // });
+
+    res.status(201).json({
+      success: true,
+      message: "Registration successful.",
+      token: token,
+      user: {
+        _id: newUser._id,
+        email: newUser.email,
+        userName: newUser.userName,
+        role: newUser.role
+      }
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: "Server error.",
+    });
+  }
 };
 
-//Login
+// Login
 const loginUser = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      success: false,
+      errors: errors.array()
+    });
+  }
+
   const { email, password } = req.body;
 
   try {
@@ -94,19 +118,19 @@ const loginUser = async (req, res) => {
     // res.cookie("token", token, {
     //   httpOnly: true,
     //   maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-    //   secure:false
+    //   secure: false
     // });
 
-    //  res.cookie("token", token, {
+    // res.cookie("token", token, {
     //   httpOnly: true,
     //   maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-    //   secure:true
+    //   secure: true
     // });
 
     res.status(200).json({
       success: true,
       message: "Login successful.",
-      token:token, //token
+      token: token,
       user: {
         _id: user._id,
         email: user.email,
@@ -124,7 +148,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-//logout
+// Logout
 const logoutUser = (req, res) => {
   try {
     res.clearCookie('token', {
@@ -146,10 +170,10 @@ const logoutUser = (req, res) => {
   }
 };
 
-//auth middleware with cookies
+// Auth Middleware with Cookies
 // const authMiddleware = async (req, res, next) => {
 //   const { token } = req.cookies;
-  
+
 //   try {
 //     if (!token) {
 //       return res.status(401).json({
@@ -161,7 +185,7 @@ const logoutUser = (req, res) => {
 //     const decoded = jwt.verify(token, process.env.JWTSECRET);
 //     const { _id } = decoded;
 
-//     const user = await User.findById(_id).select("-password"); //  don't fetch password
+//     const user = await User.findById(_id).select("-password");
 
 //     if (!user) {
 //       return res.status(401).json({
@@ -180,11 +204,11 @@ const logoutUser = (req, res) => {
 //   }
 // };
 
-
-//auth middleware with sessionstorage
+// Auth Middleware with SessionStorage (Authorization Header)
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader?.split(' ')[1]
+  const token = authHeader && authHeader?.split(' ')[1];
+
   try {
     if (!token) {
       return res.status(401).json({
@@ -196,7 +220,7 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWTSECRET);
     const { _id } = decoded;
 
-    const user = await User.findById(_id).select("-password"); //  don't fetch password
+    const user = await User.findById(_id).select("-password");
 
     if (!user) {
       return res.status(401).json({
@@ -215,4 +239,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = {registerUser,loginUser,logoutUser,authMiddleware}
+module.exports = { registerUser, loginUser, logoutUser, authMiddleware };

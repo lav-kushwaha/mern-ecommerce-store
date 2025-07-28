@@ -4,30 +4,37 @@ import CommonForm from '../../components/common/form';
 import { registerFormControls } from '../../config';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '../../store/auth-slice';
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 const initialState = {
-  userName:'',
-  email:'',
-  password:''
-}
+  userName: '',
+  email: '',
+  password: ''
+};
 
 const AuthRegister = () => {
-  const [formData, setFormData] = useState(initialState)
+  const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  function onSubmit(event){
+  function onSubmit(event) {
     event.preventDefault();
-    dispatch(registerUser(formData)).then((data)=>{
-      if(data?.payload?.success) {
-        toast.success(data?.payload?.message);
+
+    dispatch(registerUser(formData)).then((data) => {
+      const res = data?.payload;
+
+      if (res?.success) {
+        toast.success(res.message);
         navigate("/auth/login");
-      }else{
-        toast.warning(data?.payload?.message);
+      } else if (res?.errors) {
+        //Display all validation errors
+        res.errors.forEach((err) => {
+          toast.error(err.msg);
+        });
+      } else {
+        toast.error(res?.message || "Something went wrong");
       }
-    }
-    )
+    });
   }
 
   return (
@@ -40,12 +47,12 @@ const AuthRegister = () => {
         </p>
       </div>
       <CommonForm 
-      formControls={registerFormControls} 
-      buttonText={'Sign Up'}
-      formData={formData}
-      setFormData={setFormData}
-      onSubmit={onSubmit}
-    />
+        formControls={registerFormControls} 
+        buttonText={'Sign Up'}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={onSubmit}
+      />
     </div>
   );
 };
