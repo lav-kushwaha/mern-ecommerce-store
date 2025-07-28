@@ -76,7 +76,7 @@ const addProductReview = async (req, res) => {
 // Get all reviews for a product
 const getProductReviews = async (req, res) => {
   try {
-    const { productId } = req.params;
+    const { productId } = req.params;    
 
     const reviews = await ProductReview.find({ productId }).sort({ createdAt: -1 });
 

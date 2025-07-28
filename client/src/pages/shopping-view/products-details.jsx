@@ -30,9 +30,11 @@ const ProductDetails = () => {
     dispatch(fetchProductDetails({ id }));
   }, [dispatch, id]);
 
+  //the effect re-runs and fetches the new product's reviews.
+  //If the user navigates to another product, the id will change.
   useEffect(() => {
   if (id) {
-    dispatch(getReviews({ productId: id }));
+    dispatch(getReviews(id));
   }
   }, [dispatch, id]);
 
