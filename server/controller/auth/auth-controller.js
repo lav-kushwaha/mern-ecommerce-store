@@ -42,11 +42,12 @@ const registerUser = async (req, res) => {
         //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
         // });
 
-          res.cookie('token', token, {
-            httpOnly: true,
-            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-            secure:true
-        });
+        //   res.cookie('token', token, {
+        //     httpOnly: true,
+        //     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+        //     secure:true
+        // });
+
 
         res.status(201).json({
             success: true,
@@ -96,15 +97,16 @@ const loginUser = async (req, res) => {
     //   secure:false
     // });
 
-     res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-      secure:true
-    });
+    //  res.cookie("token", token, {
+    //   httpOnly: true,
+    //   maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    //   secure:true
+    // });
 
     res.status(200).json({
       success: true,
       message: "Login successful.",
+      token:token, //token
       user: {
         _id: user._id,
         email: user.email,
@@ -144,10 +146,45 @@ const logoutUser = (req, res) => {
   }
 };
 
-//auth middleware
-const authMiddleware = async (req, res, next) => {
-  const { token } = req.cookies;
+//auth middleware with cookies
+// const authMiddleware = async (req, res, next) => {
+//   const { token } = req.cookies;
   
+//   try {
+//     if (!token) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Unauthorized User!",
+//       });
+//     }
+
+//     const decoded = jwt.verify(token, process.env.JWTSECRET);
+//     const { _id } = decoded;
+
+//     const user = await User.findById(_id).select("-password"); //  don't fetch password
+
+//     if (!user) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "User not found!",
+//       });
+//     }
+
+//     req.user = user;
+//     next();
+//   } catch (err) {
+//     return res.status(401).json({
+//       success: false,
+//       message: "Unauthorized User!",
+//     });
+//   }
+// };
+
+
+//auth middleware with sessionstorage
+const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader?.split(' ')[1]
   try {
     if (!token) {
       return res.status(401).json({

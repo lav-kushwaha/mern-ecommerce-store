@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { logoutUser } from '../../store/auth-slice';
+import { logoutUser, resetTokenAndCredentials } from '../../store/auth-slice';
 import { toast } from 'sonner';
 import { shoppingViewHeaderMenuItems } from '../../config';
 import UserCartWrapper from './cart-wrapper';
@@ -96,6 +96,8 @@ function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = f
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [openCartSheet, setOpenCartSheet] = useState(false);
 
   useEffect(() => {
@@ -107,13 +109,18 @@ function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = f
   const totalItemCount = cartItems.items?.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
-    dispatch(logoutUser())
-      .then((res) => {
-        if (res?.payload?.success) {
-          toast.success(res.payload.message);
-        }
-      })
-      .catch((err) => console.error(err));
+    dispatch(resetTokenAndCredentials());
+    sessionStorage.clear();
+    navigate('/auth/login');
+    toast.success("Logout Successfully!");
+
+    // dispatch(logoutUser())
+    //   .then((res) => {
+    //     if (res?.payload?.success) {
+    //       toast.success(res?.payload?.message);
+    //     }
+    //   })
+    //   .catch((err) => console.error(err));
   };
 
   if (isMobileCartOnly) {

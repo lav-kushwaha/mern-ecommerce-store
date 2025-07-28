@@ -2,18 +2,24 @@ import React from 'react'
 import { Button } from '../ui/button';
 import { AlignJustify } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../../store/auth-slice';
+import { logoutUser, resetTokenAndCredentials } from '../../store/auth-slice';
 import { toast } from 'sonner';
+import {useNavigate } from 'react-router-dom';
 
 const AdminHeader = ({setOpen}) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   function handleLogout(){
-    dispatch(logoutUser()).then((data)=>{
-      console.log(data);
-       if(data?.payload?.success){
-        toast.success(data?.payload?.message)
-       }
-    })
+        dispatch(resetTokenAndCredentials());
+        sessionStorage.clear();
+        navigate('/auth/login');
+        toast.success("Logout Successfully!");
+    // dispatch(logoutUser()).then((data)=>{
+    //    if(data?.payload?.success){
+    //     toast.success(data?.payload?.message)
+    //    }
+    // })
   }
   return (
     <header className='flex items-center justify-between px-4 py-3 bg-background border-b'>
