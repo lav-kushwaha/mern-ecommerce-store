@@ -10,23 +10,23 @@ It supports a **role-based access system**, where:
 
 ## 🚀 Live Demo
 
-- Live Project Link : (https://mern-ecommerce-store-1-66zv.onrender.com)
+🔗 [Live Website](https://mern-ecommerce-store-1-66zv.onrender.com)
 
 ---
 
-## 🔧 Technologies Used
+## 🧰 Tech Stack
 
-### 🖥️ Frontend:
+### 🖥️ Frontend
 - **React.js**
+- **Redux Toolkit** + `createAsyncThunk`
 - **Tailwind CSS**
 - **ShadCN UI**
 - **React Router DOM**
-- **Redux Toolkit** with `createAsyncThunk`
-- **Lucide Icons**
 - **Axios**
+- **Lucide Icons**
 - **React Loading Skeleton**
 
-### 🌐 Backend:
+### 🌐 Backend
 - **Node.js**
 - **Express.js**
 - **MongoDB** (via **Mongoose Atlas**)
@@ -35,35 +35,34 @@ It supports a **role-based access system**, where:
 - **Cookie Parser**
 - **dotenv**
 
-### 🔐 Authentication & Security:
-- **JWT (JSON Web Tokens)**
-- **Cookies**
-- **bcrypt.js** (for password hashing)
+### 🔐 Authentication & Security
+- **JWT (JSON Web Tokens)** + HTTP-only **cookies**
+- **bcrypt.js** for password hashing
+- **Role-based access control**
 
-### 📷 Image Upload:
-- **Multer**
-- **Cloudinary**
+### 📷 File Uploads
+- **Multer** for file handling
+- **Cloudinary** for cloud image storage
 
-### 💳 Payment Gateway:
-- **PayPal**
+### 💳 Payment Integration
+- **PayPal REST SDK**
 
-### 🌍 Deployment:
-- **Frontend**: Render
-- **Backend**: Render
+### ☁️ Deployment
+- **Frontend & Backend**: Render
 - **Database**: MongoDB Atlas
 
 ---
 
-## 📦 Features
+## ⚙️ Features & Functionality
 
 ### 👤 User Panel
 
 - 🛒 Browse and search products
-- 🔍 Filter by categories, brands
+- 🔍 Filter by categories, brands or gender
 - 🗂️ Sort by:
   - Newest
   - Top Rated
-  - Price: Low → High and High → Low
+  - Price (Low → High / High → Low)
   - Title: A–Z / Z–A
 - 📱 View detailed product pages (with up to 5 images)
 - ❤️ Recommended products by category
@@ -75,70 +74,80 @@ It supports a **role-based access system**, where:
   - Secure payment via PayPal
 - ✅ Post-payment order confirmation
 - 👀 View order history and track status
-- ✍️ Leave reviews **only if purchased**
+- ✍️ Write reviews **only if purchased**
 - 🔁 Pagination:
   - Products: 10 per page
   - Reviews: 4 per page
-
+ 
 ---
 
 ### 🛠️ Admin Panel
 
-- ➕ Add products
-- ✏️ Edit products
+- ➕ Add products with multiple images
+- ✏️ Edit product details and inventory
 - ❌ Delete products
-- 📊 View all orders
-- 🔄 Update order status
-- 👥 Role-based access (Admin & User)
+- 📋 View all orders and order statuses
+- 🔄 Update order delivery status
+- 👥 Role-based dashboard access
 
 ---
 
-## 🔐 Authentication & Security
+## 🔐 Security Highlights
 
 - JWT-based user authentication
-- Role-based access control (User/Admin)
-- Password hashing with bcrypt
-- Secure cookie handling with cookie-parser
-- CORS enabled
+- Role-based route protection (User/Admin)
+- Password encryption via **bcrypt.js**
+- Secure cookie handling with **cookie-parser**
+- Input validation via **express-validator**
+- CORS configured for safe frontend-backend interaction
 
 ---
 
-## 💳 Payment Integration
+## 📷 Image Handling
 
-- Integrated **PayPal** gateway
-- Automatic redirection on success/failure
-- Secure transaction flow
-- Order confirmation and payment validation
-
----
-
-## 🖼️ Image Handling
-
-- Upload product images via **Multer**
-- Store and serve images via **Cloudinary**
-- Support for up to 5 images per product
+- Product images uploaded via **Multer**
+- Stored and served through **Cloudinary**
+- Supports up to 5 images per product
 
 ---
 
-## 🧪 Project Highlights
+## 💳 Payment Flow
 
-- Responsive design using Tailwind CSS & ShadCN UI
-- Real-time online/offline detection
-- Optimized user experience with loading skeletons
-- Secure API access with proper validation & headers
-- Organized codebase with modular structure
-
----
-
-## 🌐 Deployment
-
-- **Frontend** and **Backend** deployed on **Render**
-- **Database** hosted on **MongoDB Atlas**
+- Integrated with **PayPal**
+- Automatic redirection upon payment success or failure
+- Verified transactions before order confirmation
+- Secure payment handling with real-time updates
 
 ---
 
-## Author
-Name: Lav Kushwaha
-GitHub: @lav-kushwaha
-Email: lavkushwahaa@gmail.com
+## 🧑‍💻 UX & UI Highlights
 
+- Built with **Tailwind CSS** and **ShadCN UI**
+- Fully responsive design for all screen sizes
+- **Offline detection** with visual feedback
+- Loading skeletons using **React Skeleton**
+- Clean and modern user interface with intuitive navigation
+
+---
+
+## 📌 Upcoming Enhancements
+
+- [ ] Wishlist functionality
+- [ ] Stripe integration option
+- [ ] Sales analytics for Admin
+- [ ] Email notifications on orders
+
+---
+
+## 👤 Author
+
+**Lav Kushwaha**
+
+- GitHub: [@lav-kushwaha](https://github.com/lav-kushwaha)
+- Email: [lavkushwahaa@gmail.com](mailto:lavkushwahaa@gmail.com)
+
+---
+
+## 📜 License
+
+This project is open-source and available under the [MIT License](LICENSE).
