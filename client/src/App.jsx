@@ -67,26 +67,20 @@ function App() {
 
       <Routes>
         {/* Auth Check for root */}
-       import LandingLayout from "./pages/Landing-page/LandingLayout"; // 👈 import at the top
-
-// ...
-
-<Route
-  path="/"
-  element={
-    isAuthenticated
-      ? user?.role === "admin"
-        ? <Navigate to="/admin/dashboard" replace />
-        : <Navigate to="/shop/home" replace />
-      : (
-          <LandingLayout>
-            <LandingPage />
-          </LandingLayout>
-        )
-  }
-/>
-
-
+        <Route
+        path="/"
+        element={
+          isAuthenticated
+            ? user?.role === "admin"
+              ? <Navigate to="/admin/dashboard" replace />
+              : <Navigate to="/shop/home" replace />
+            : (
+                <LandingLayout>
+                  <LandingPage />
+                </LandingLayout>
+              )
+        }
+      />
 
         {/* Auth Pages */}
         <Route
