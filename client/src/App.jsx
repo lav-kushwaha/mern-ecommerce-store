@@ -36,6 +36,8 @@ import ScrollToTop from "./components/common/scrollToTop";
 
 //loader
 import { Loader2 } from "lucide-react";
+import LandingPage from "./pages/Landing-page/LandingPage";
+import LandingLayout from "./pages/Landing-page/LandingLayout";
 
 const Loader = () => (
   <div className="w-full h-screen flex flex-col items-center justify-center bg-white text-black gap-6">
@@ -65,10 +67,26 @@ function App() {
 
       <Routes>
         {/* Auth Check for root */}
-        <Route
-          path="/"
-          element={<CheckAuth isAuthenticated={isAuthenticated} user={user} />}
-        />
+       import LandingLayout from "./pages/Landing-page/LandingLayout"; // 👈 import at the top
+
+// ...
+
+<Route
+  path="/"
+  element={
+    isAuthenticated
+      ? user?.role === "admin"
+        ? <Navigate to="/admin/dashboard" replace />
+        : <Navigate to="/shop/home" replace />
+      : (
+          <LandingLayout>
+            <LandingPage />
+          </LandingLayout>
+        )
+  }
+/>
+
+
 
         {/* Auth Pages */}
         <Route

@@ -53,22 +53,25 @@ const handleNavigate = (item) => {
   onNavigate?.();
 };
 
-  const isItemActive = (item) => {
-    if (item.id === 'home') return location.pathname === '/shop/home';
-    if (item.id === 'products') {
-      return location.pathname === '/shop/listing' && !searchParams.get('category');
-    }
-    if (
-      location.pathname === '/shop/listing' &&
-      searchParams.get('category') === item.id
-    ) {
-      return true;
-    }
-    if (item.id === 'search') {
-      return location.pathname === '/shop/search';
-    }
-    return false;
-  };
+ const isItemActive = (item) => {
+  if (item.id === 'home') {
+    return location.pathname === '/' || location.pathname === '/shop/home';
+  }
+  if (item.id === 'products') {
+    return location.pathname === '/shop/listing' && !searchParams.get('category');
+  }
+  if (
+    location.pathname === '/shop/listing' &&
+    searchParams.get('category') === item.id
+  ) {
+    return true;
+  }
+  if (item.id === 'search') {
+    return location.pathname === '/shop/search';
+  }
+  return false;
+};
+
 
   return (
     <nav className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
@@ -144,19 +147,42 @@ function HeaderRightContent({ isMobile = false, onNavigate, isMobileCartOnly = f
     );
   }
 
-  if (!user) {
-    return isMobile ? (
-      <div className="flex flex-col gap-3 border-t pt-4">
-        <Link to="/auth/login" onClick={onNavigate} className="text-sm text-blue-600 font-medium">Login</Link>
-        <Link to="/auth/register" onClick={onNavigate} className="text-sm text-blue-600 font-medium">Register</Link>
-      </div>
-    ) : (
-      <div className="flex items-center gap-4">
-        <Link to="/auth/login" className="text-sm text-blue-600 font-medium hover:underline">Login</Link>
-        <Link to="/auth/register" className="text-sm text-blue-600 font-medium hover:underline">Register</Link>
-      </div>
-    );
-  }
+ if (!user) {
+  return isMobile ? (
+    <div className="flex flex-col gap-3 border-t pt-4">
+      <Link
+        to="/auth/login"
+        onClick={onNavigate}
+        className="text-sm text-gray-700 font-medium hover:text-black transition-colors"
+      >
+        Login
+      </Link>
+      <Link
+        to="/auth/register"
+        onClick={onNavigate}
+        className="text-sm text-gray-700 font-medium hover:text-black transition-colors"
+      >
+        Register
+      </Link>
+    </div>
+  ) : (
+    <div className="flex items-center gap-4">
+      <Link
+        to="/auth/login"
+        className="text-sm text-gray-700 font-medium hover:text-black transition-colors"
+      >
+        Login
+      </Link>
+      <Link
+        to="/auth/register"
+        className="text-sm text-gray-700 font-medium hover:text-black transition-colors"
+      >
+        Register
+      </Link>
+    </div>
+  );
+}
+
 
   const accountSection = (
     <>
