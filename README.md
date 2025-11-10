@@ -78,7 +78,7 @@ It supports a **role-based access system**, where:
 - 🔁 Pagination:
   - Products: 10 per page
   - Reviews: 4 per page
- 
+
 ---
 
 ### 🛠️ Admin Panel
