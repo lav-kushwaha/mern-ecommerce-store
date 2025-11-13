@@ -49,7 +49,6 @@ const Loader = () => (
   </div>
 );
 
-
 function App() {
   const { isAuthenticated, user, isLoading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
@@ -59,12 +58,12 @@ function App() {
     dispatch(checkAuth(token));
   }, [dispatch]);
 
+  
   if (isLoading) return <Loader />;
 
   return (
     <div className="flex flex-col overflow-hidden bg-black">
       <ScrollToTop />
-
       <Routes>
         {/* Auth Check for root */}
         <Route

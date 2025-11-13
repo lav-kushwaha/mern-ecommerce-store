@@ -18,6 +18,10 @@ const commonFeaturesRouter = require('../server/routes/common/features-routes.js
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
 //read req.body from client or parse data into json to js.
 app.use(express.json());
 app.use(cookieParser());

@@ -129,8 +129,8 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload?.success ? action.payload.user : null;
-        state.isAuthenticated = action.payload.success;
+        state.user = action.payload?.success ? action?.payload?.user : null;
+        state.isAuthenticated = action?.payload?.success;
         state.token = action?.payload?.token;
         sessionStorage.setItem('token',JSON.stringify(action?.payload?.token))
       })
@@ -150,13 +150,13 @@ const authSlice = createSlice({
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload?.success ? action.payload.user : null;
-        state.isAuthenticated = action.payload?.success;
+        state.isAuthenticated = action?.payload?.success;
       })
       .addCase(checkAuth.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
-        state.error = action.payload?.message || "Auth check failed";
+        state.error = action?.payload?.message || "Auth check failed";
       })
 
       //logout user
@@ -164,10 +164,10 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
-        state.error = action.payload?.message || "Logout failed";
+        state.error = action?.payload?.message || "Logout failed";
       });
   }
 });
 
-export const { setUser, resetTokenAndCredentials} = authSlice.actions;
+export const { setUser, resetTokenAndCredentials} = authSlice?.actions;
 export const authReducer = authSlice.reducer;
